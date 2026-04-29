@@ -1,0 +1,648 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aiscad.dsl/actions/solids",
+  "category": "solids",
+  "produces": [
+    "geom3"
+  ],
+  "actions": {
+    "solid.box": {
+      "role": "生成长方体",
+      "inputKinds": [],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "size"
+        ],
+        "properties": {
+          "size": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+          },
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "生成长方体",
+        "requiredParams": [
+          "size"
+        ],
+        "paramGuide": {
+          "size": "vector3，长度为 3 的数值数组。 尺寸向量。2D 时为 [x, y]，3D 时为 [x, y, z]。",
+          "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "solid_box_example",
+          "action": "solid.box",
+          "params": {
+            "size": [
+              40,
+              20,
+              10
+            ],
+            "center": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "solid.roundedBox": {
+      "role": "生成圆角或倒角长方体",
+      "inputKinds": [],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "size",
+          "radius"
+        ],
+        "properties": {
+          "size": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+          },
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          },
+          "radius": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "style": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/cornerStyle",
+            "default": "round"
+          },
+          "segments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "生成圆角或倒角长方体",
+        "requiredParams": [
+          "size",
+          "radius"
+        ],
+        "paramGuide": {
+          "size": "vector3，长度为 3 的数值数组。 尺寸向量。2D 时为 [x, y]，3D 时为 [x, y, z]。",
+          "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。",
+          "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+          "style": "enum，可选值为 round / chamfer / edge。 默认值 \"round\"。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "solid_roundedBox_example",
+          "action": "solid.roundedBox",
+          "params": {
+            "size": [
+              40,
+              20,
+              10
+            ],
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "radius": 2,
+            "style": "round",
+            "segments": 32
+          }
+        }
+      }
+    },
+    "solid.sphere": {
+      "role": "生成球体",
+      "inputKinds": [],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "radius"
+        ],
+        "properties": {
+          "radius": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          },
+          "segments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "生成球体",
+        "requiredParams": [
+          "radius"
+        ],
+        "paramGuide": {
+          "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+          "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "solid_sphere_example",
+          "action": "solid.sphere",
+          "params": {
+            "radius": 12,
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "segments": 32
+          }
+        }
+      }
+    },
+    "solid.geodesicSphere": {
+      "role": "生成测地球，更适合低面数稳定拓扑",
+      "inputKinds": [],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "radius"
+        ],
+        "properties": {
+          "radius": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          },
+          "frequency": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+            "default": 6
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "生成测地球，更适合低面数稳定拓扑",
+        "requiredParams": [
+          "radius"
+        ],
+        "paramGuide": {
+          "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+          "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。",
+          "frequency": "integer，整数，或 {\"$var\":\"变量名\"}。 测地球细分频率。 默认值 6。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "solid_geodesicSphere_example",
+          "action": "solid.geodesicSphere",
+          "params": {
+            "radius": 12,
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "frequency": 6
+          }
+        }
+      }
+    },
+    "solid.cylinder": {
+      "role": "生成正圆柱或圆台",
+      "inputKinds": [],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "height"
+        ],
+        "properties": {
+          "height": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "radius": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "radiusTop": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "radiusBottom": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          },
+          "segments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "height",
+              "radius"
+            ]
+          },
+          {
+            "required": [
+              "height",
+              "radiusTop",
+              "radiusBottom"
+            ]
+          }
+        ],
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "生成正圆柱或圆台",
+        "requiredParams": [
+          "height"
+        ],
+        "paramGuide": {
+          "height": "number，数值，或 {\"$var\":\"变量名\"}。 高度。",
+          "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+          "radiusTop": "number，数值，或 {\"$var\":\"变量名\"}。 顶部半径。",
+          "radiusBottom": "number，数值，或 {\"$var\":\"变量名\"}。 底部半径。",
+          "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+        },
+        "constraints": [
+          "必须满足 [height + radius] 或 [height + radiusTop + radiusBottom]。"
+        ],
+        "example": {
+          "id": "solid_cylinder_example",
+          "action": "solid.cylinder",
+          "params": {
+            "height": 20,
+            "radius": 8,
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "segments": 32
+          }
+        }
+      }
+    },
+    "solid.ellipticalCylinder": {
+      "role": "生成椭圆截面柱体或锥台",
+      "inputKinds": [],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "height",
+          "radiusTop",
+          "radiusBottom"
+        ],
+        "properties": {
+          "height": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "radiusTop": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+          },
+          "radiusBottom": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+          },
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          },
+          "segments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "生成椭圆截面柱体或锥台",
+        "requiredParams": [
+          "height",
+          "radiusTop",
+          "radiusBottom"
+        ],
+        "paramGuide": {
+          "height": "number，数值，或 {\"$var\":\"变量名\"}。 高度。",
+          "radiusTop": "vector2，长度为 2 的数值数组。 顶部半径。",
+          "radiusBottom": "vector2，长度为 2 的数值数组。 底部半径。",
+          "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "solid_ellipticalCylinder_example",
+          "action": "solid.ellipticalCylinder",
+          "params": {
+            "height": 20,
+            "radiusTop": [
+              6,
+              4
+            ],
+            "radiusBottom": [
+              10,
+              8
+            ],
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "segments": 32
+          }
+        }
+      }
+    },
+    "solid.roundedCylinder": {
+      "role": "生成圆角柱体",
+      "inputKinds": [],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "height",
+          "radius",
+          "roundRadius"
+        ],
+        "properties": {
+          "height": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "radius": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "roundRadius": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          },
+          "segments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "生成圆角柱体",
+        "requiredParams": [
+          "height",
+          "radius",
+          "roundRadius"
+        ],
+        "paramGuide": {
+          "height": "number，数值，或 {\"$var\":\"变量名\"}。 高度。",
+          "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+          "roundRadius": "number，数值，或 {\"$var\":\"变量名\"}。 圆角半径。",
+          "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "solid_roundedCylinder_example",
+          "action": "solid.roundedCylinder",
+          "params": {
+            "height": 20,
+            "radius": 8,
+            "roundRadius": 2,
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "segments": 32
+          }
+        }
+      }
+    },
+    "solid.torus": {
+      "role": "生成圆环体",
+      "inputKinds": [],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "innerRadius",
+          "outerRadius"
+        ],
+        "properties": {
+          "innerRadius": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "outerRadius": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "innerSegments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          },
+          "outerSegments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          },
+          "innerRotation": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue",
+            "default": 0
+          },
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "生成圆环体",
+        "requiredParams": [
+          "innerRadius",
+          "outerRadius"
+        ],
+        "paramGuide": {
+          "innerRadius": "number，数值，或 {\"$var\":\"变量名\"}。 内半径。",
+          "outerRadius": "number，数值，或 {\"$var\":\"变量名\"}。 外半径。",
+          "innerSegments": "integer，整数，或 {\"$var\":\"变量名\"}。 内圈分段数。",
+          "outerSegments": "integer，整数，或 {\"$var\":\"变量名\"}。 外圈分段数。",
+          "innerRotation": "number，数值，或 {\"$var\":\"变量名\"}。 内圈旋转角度，单位为度。 默认值 0。",
+          "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "solid_torus_example",
+          "action": "solid.torus",
+          "params": {
+            "innerRadius": 4,
+            "outerRadius": 12,
+            "innerSegments": 24,
+            "outerSegments": 48,
+            "innerRotation": 0,
+            "center": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "solid.polyhedron": {
+      "role": "通过顶点和面定义任意三维网格实体",
+      "inputKinds": [],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "points",
+          "faces"
+        ],
+        "properties": {
+          "points": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/point3List"
+          },
+          "faces": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "minItems": 3
+            },
+            "minItems": 1
+          },
+          "orientation": {
+            "type": "string",
+            "enum": [
+              "outward",
+              "inward"
+            ],
+            "default": "outward"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "通过顶点和面定义任意三维网格实体",
+        "requiredParams": [
+          "points",
+          "faces"
+        ],
+        "paramGuide": {
+          "points": "point3[]，三维点数组。 点列表，按顺序定义轮廓或路径。",
+          "faces": "array，数组。 面索引列表。",
+          "orientation": "enum，可选值：outward / inward。 多面体面朝向。 默认值 \"outward\"。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "solid_polyhedron_example",
+          "action": "solid.polyhedron",
+          "params": {
+            "points": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                20,
+                0,
+                0
+              ],
+              [
+                0,
+                20,
+                0
+              ],
+              [
+                0,
+                0,
+                20
+              ]
+            ],
+            "faces": [
+              [
+                0,
+                1,
+                2
+              ],
+              [
+                0,
+                1,
+                3
+              ],
+              [
+                0,
+                2,
+                3
+              ],
+              [
+                1,
+                2,
+                3
+              ]
+            ],
+            "orientation": "outward"
+          }
+        }
+      }
+    }
+  },
+  "llm": {
+    "purpose": "三维原语 action 定义。",
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+  }
+}

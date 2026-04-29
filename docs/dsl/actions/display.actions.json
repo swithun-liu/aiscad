@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aiscad.dsl/actions/display",
+  "category": "display",
+  "actions": {
+    "display.color": {
+      "role": "给几何附加预览颜色，不改变几何本体",
+      "inputKinds": [
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "same-as-source",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "rgba"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "rgba": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/rgba"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "给几何附加预览颜色，不改变几何本体",
+        "requiredParams": [
+          "source",
+          "rgba"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "rgba": "rgba，长度为 4 的颜色数组，范围 0 到 1。 颜色数组，格式为 [r, g, b, a]，范围 0 到 1。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "display_color_example",
+          "action": "display.color",
+          "params": {
+            "source": "body",
+            "rgba": [
+              0.2,
+              0.4,
+              0.9,
+              1
+            ]
+          }
+        }
+      }
+    },
+    "display.group": {
+      "role": "把多个对象组织成一个逻辑输出组",
+      "inputKinds": [
+        "curve2",
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "group",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "sources"
+        ],
+        "properties": {
+          "sources": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/refList"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "把多个对象组织成一个逻辑输出组",
+        "requiredParams": [
+          "sources"
+        ],
+        "paramGuide": {
+          "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "display_group_example",
+          "action": "display.group",
+          "params": {
+            "sources": [
+              "part_a",
+              "part_b"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "llm": {
+    "purpose": "显示与逻辑分组类 action 定义。",
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+  }
+}

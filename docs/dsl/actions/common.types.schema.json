@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aiscad.dsl/actions/common.types",
+  "$defs": {
+    "ref": {
+      "type": "string",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+    },
+    "refList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ref"
+      },
+      "minItems": 1
+    },
+    "numberValue": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "object",
+          "required": [
+            "$var"
+          ],
+          "properties": {
+            "$var": {
+              "type": "string",
+              "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "booleanValue": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "object",
+          "required": [
+            "$var"
+          ],
+          "properties": {
+            "$var": {
+              "type": "string",
+              "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "stringValue": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "required": [
+            "$var"
+          ],
+          "properties": {
+            "$var": {
+              "type": "string",
+              "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "integerValue": {
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "object",
+          "required": [
+            "$var"
+          ],
+          "properties": {
+            "$var": {
+              "type": "string",
+              "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "vector2": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/numberValue"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "vector3": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/numberValue"
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "vector4": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/numberValue"
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "point2List": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/vector2"
+      },
+      "minItems": 2
+    },
+    "point3List": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/vector3"
+      },
+      "minItems": 3
+    },
+    "rgba": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "axis": {
+      "type": "string",
+      "enum": [
+        "x",
+        "y",
+        "z"
+      ]
+    },
+    "cornerStyle": {
+      "type": "string",
+      "enum": [
+        "round",
+        "chamfer",
+        "edge"
+      ]
+    },
+    "caps": {
+      "type": "string",
+      "enum": [
+        "none",
+        "start",
+        "end",
+        "both"
+      ]
+    },
+    "plane": {
+      "type": "object",
+      "required": [
+        "origin",
+        "normal"
+      ],
+      "properties": {
+        "origin": {
+          "$ref": "#/$defs/vector3"
+        },
+        "normal": {
+          "$ref": "#/$defs/vector3"
+        }
+      },
+      "additionalProperties": false
+    },
+    "matrix4x4": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/numberValue"
+        },
+        "minItems": 4,
+        "maxItems": 4
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "curve2",
+        "geom2",
+        "geom3",
+        "group"
+      ]
+    },
+    "kindList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/kind"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "llm": {
+    "purpose": "公共参数类型定义，所有 action 的 paramsSchema 都会引用这里。可以直接给大模型阅读。",
+    "readRule": "看到 $ref 指向这里时，按对应类型说明理解参数格式。",
+    "typeGuide": {
+      "ref": "字符串，引用前面 action 的 id。",
+      "refList": "字符串数组，引用多个前面 action 的 id。",
+      "numberValue": "数值，或 {\"$var\":\"变量名\"}。",
+      "booleanValue": "布尔值，或 {\"$var\":\"变量名\"}。",
+      "stringValue": "字符串，或 {\"$var\":\"变量名\"}。",
+      "integerValue": "整数，或 {\"$var\":\"变量名\"}。",
+      "vector2": "长度为 2 的数值数组。",
+      "vector3": "长度为 3 的数值数组。",
+      "vector4": "长度为 4 的数值数组。",
+      "point2List": "二维点数组，例如 [[0,0],[10,0],[10,10]]。",
+      "point3List": "三维点数组。",
+      "rgba": "颜色数组 [r,g,b,a]，范围 0 到 1。",
+      "axis": "字符串，只能是 x / y / z。",
+      "cornerStyle": "字符串，只能是 round / chamfer / edge。",
+      "caps": "字符串，只能是 none / start / end / both。",
+      "plane": "对象，格式为 { origin:[x,y,z], normal:[x,y,z] }。",
+      "matrix4x4": "4x4 数值矩阵。"
+    }
+  }
+}

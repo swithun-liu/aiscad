@@ -1,0 +1,17 @@
+{
+  "dsl": "aiscad.dsl",
+  "version": "1.0.0",
+  "programSchema": "program.schema.json",
+  "actionSets": {
+    "commonTypes": "actions/common.types.schema.json",
+    "curves": "actions/curves.actions.json",
+    "sketches": "actions/sketches.actions.json",
+    "solids": "actions/solids.actions.json",
+    "construct": "actions/construct.actions.json",
+    "transforms": "actions/transforms.actions.json",
+    "booleans": "actions/booleans.actions.json",
+    "modifiers": "actions/modifiers.actions.json",
+    "patterns": "actions/patterns.actions.json",
+    "display": "actions/display.actions.json"
+  }
+}

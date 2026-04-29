@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aiscad.dsl/actions/booleans",
+  "category": "booleans",
+  "actions": {
+    "boolean.union": {
+      "role": "并集组合多个同维几何",
+      "inputKinds": [
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "same-dimension",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "sources"
+        ],
+        "properties": {
+          "sources": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/refList"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "并集组合多个同维几何",
+        "requiredParams": [
+          "sources"
+        ],
+        "paramGuide": {
+          "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "boolean_union_example",
+          "action": "boolean.union",
+          "params": {
+            "sources": [
+              "part_a",
+              "part_b"
+            ]
+          }
+        }
+      }
+    },
+    "boolean.subtract": {
+      "role": "从基体中减去一个或多个工具体",
+      "inputKinds": [
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "same-dimension-as-base",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "base",
+          "tools"
+        ],
+        "properties": {
+          "base": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "tools": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/refList"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "从基体中减去一个或多个工具体",
+        "requiredParams": [
+          "base",
+          "tools"
+        ],
+        "paramGuide": {
+          "base": "ref，字符串，引用前序 action 的 id。 减法基体引用。",
+          "tools": "ref[]，字符串数组，引用多个前序 action 的 id。 减法工具体引用数组。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "boolean_subtract_example",
+          "action": "boolean.subtract",
+          "params": {
+            "base": "base_body",
+            "tools": [
+              "tool_body"
+            ]
+          }
+        }
+      }
+    },
+    "boolean.intersect": {
+      "role": "求多个同维几何的交集",
+      "inputKinds": [
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "same-dimension",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "sources"
+        ],
+        "properties": {
+          "sources": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/refList"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "求多个同维几何的交集",
+        "requiredParams": [
+          "sources"
+        ],
+        "paramGuide": {
+          "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "boolean_intersect_example",
+          "action": "boolean.intersect",
+          "params": {
+            "sources": [
+              "part_a",
+              "part_b"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "llm": {
+    "purpose": "布尔运算类 action 定义。",
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+  }
+}

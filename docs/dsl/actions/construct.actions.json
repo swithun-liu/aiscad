@@ -1,0 +1,437 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aiscad.dsl/actions/construct",
+  "category": "construct",
+  "actions": {
+    "construct.extrudeLinear": {
+      "role": "将二维草图沿法向线性拉伸成实体",
+      "inputKinds": [
+        "geom2"
+      ],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "height"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "height": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "twistAngle": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue",
+            "default": 0
+          },
+          "twistSteps": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+            "default": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "将二维草图沿法向线性拉伸成实体",
+        "requiredParams": [
+          "source",
+          "height"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "height": "number，数值，或 {\"$var\":\"变量名\"}。 高度。",
+          "twistAngle": "number，数值，或 {\"$var\":\"变量名\"}。 拉伸扭转角度，单位为度。 默认值 0。",
+          "twistSteps": "integer，整数，或 {\"$var\":\"变量名\"}。 扭转插值步数。 默认值 1。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "construct_extrudeLinear_example",
+          "action": "construct.extrudeLinear",
+          "params": {
+            "source": "profile",
+            "height": 20,
+            "twistAngle": 0,
+            "twistSteps": 1
+          }
+        }
+      }
+    },
+    "construct.extrudeRotate": {
+      "role": "将二维剖面绕轴旋转生成回转体",
+      "inputKinds": [
+        "geom2"
+      ],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "angle": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue",
+            "default": 360
+          },
+          "segments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          },
+          "axis": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/axis",
+            "default": "z"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "将二维剖面绕轴旋转生成回转体",
+        "requiredParams": [
+          "source"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "angle": "number，数值，或 {\"$var\":\"变量名\"}。 旋转总角度，单位为度。 默认值 360。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。",
+          "axis": "enum，只能是 x、y、z。 坐标轴，只能是 x / y / z。 默认值 \"z\"。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "construct_extrudeRotate_example",
+          "action": "construct.extrudeRotate",
+          "params": {
+            "source": "profile",
+            "angle": 360,
+            "segments": 32,
+            "axis": "z"
+          }
+        }
+      }
+    },
+    "construct.extrudeRectangular": {
+      "role": "沿二维路径扫掠矩形截面",
+      "inputKinds": [
+        "curve2"
+      ],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "size"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "size": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+          },
+          "closed": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+            "default": false
+          },
+          "caps": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/caps",
+            "default": "both"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "沿二维路径扫掠矩形截面",
+        "requiredParams": [
+          "source",
+          "size"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "size": "vector2，长度为 2 的数值数组。 尺寸向量。2D 时为 [x, y]，3D 时为 [x, y, z]。",
+          "closed": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否闭合路径或扫掠轨迹。 默认值 false。",
+          "caps": "enum，可选值为 none / start / end / both。 路径扫掠两端封口方式。 默认值 \"both\"。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "construct_extrudeRectangular_example",
+          "action": "construct.extrudeRectangular",
+          "params": {
+            "source": "path",
+            "size": [
+              4,
+              10
+            ],
+            "closed": false,
+            "caps": "both"
+          }
+        }
+      }
+    },
+    "construct.extrudeFromSlices": {
+      "role": "通过一系列切片插值生成复杂扫掠实体",
+      "inputKinds": [
+        "geom2"
+      ],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "slices"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "slices": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "required": [
+                "offset"
+              ],
+              "properties": {
+                "offset": {
+                  "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+                },
+                "translate": {
+                  "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+                },
+                "rotate": {
+                  "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+                },
+                "scale": {
+                  "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "close": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+            "default": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": false,
+        "summary": "通过一系列切片插值生成复杂扫掠实体",
+        "requiredParams": [
+          "source",
+          "slices"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "slices": "array，数组。 切片列表，用于按切片插值生成实体。",
+          "close": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 默认值 false。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "construct_extrudeFromSlices_example",
+          "action": "construct.extrudeFromSlices",
+          "params": {
+            "source": "profile",
+            "slices": [
+              {
+                "offset": 0
+              },
+              {
+                "offset": 20,
+                "scale": [
+                  0.8,
+                  0.8
+                ]
+              }
+            ],
+            "close": false
+          }
+        }
+      }
+    },
+    "construct.project": {
+      "role": "将三维实体投影为二维草图",
+      "inputKinds": [
+        "geom3"
+      ],
+      "outputKind": "geom2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "axis": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/axis",
+            "default": "z"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "orthographic",
+              "section"
+            ],
+            "default": "orthographic"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "将三维实体投影为二维草图",
+        "requiredParams": [
+          "source"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "axis": "enum，只能是 x、y、z。 坐标轴，只能是 x / y / z。 默认值 \"z\"。",
+          "mode": "enum，可选值：orthographic / section。 投影模式。 默认值 \"orthographic\"。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "construct_project_example",
+          "action": "construct.project",
+          "params": {
+            "source": "body",
+            "axis": "z",
+            "mode": "orthographic"
+          }
+        }
+      }
+    },
+    "construct.sectionByPlane": {
+      "role": "按平面切出二维截面",
+      "inputKinds": [
+        "geom3"
+      ],
+      "outputKind": "geom2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "plane"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "plane": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/plane"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": false,
+        "summary": "按平面切出二维截面",
+        "requiredParams": [
+          "source",
+          "plane"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "plane": "plane，对象格式为 { origin, normal }。 平面对象，格式为 { origin, normal }。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "construct_sectionByPlane_example",
+          "action": "construct.sectionByPlane",
+          "params": {
+            "source": "body",
+            "plane": {
+              "origin": [
+                0,
+                0,
+                0
+              ],
+              "normal": [
+                0,
+                0,
+                1
+              ]
+            }
+          }
+        }
+      }
+    },
+    "construct.cutByPlane": {
+      "role": "按平面裁掉实体一侧",
+      "inputKinds": [
+        "geom3"
+      ],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "plane",
+          "keep"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "plane": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/plane"
+          },
+          "keep": {
+            "type": "string",
+            "enum": [
+              "positive",
+              "negative"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": false,
+        "summary": "按平面裁掉实体一侧",
+        "requiredParams": [
+          "source",
+          "plane",
+          "keep"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "plane": "plane，对象格式为 { origin, normal }。 平面对象，格式为 { origin, normal }。",
+          "keep": "enum，可选值：positive / negative。 裁切时保留平面正侧或负侧。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "construct_cutByPlane_example",
+          "action": "construct.cutByPlane",
+          "params": {
+            "source": "body",
+            "plane": {
+              "origin": [
+                0,
+                0,
+                0
+              ],
+              "normal": [
+                0,
+                0,
+                1
+              ]
+            },
+            "keep": "positive"
+          }
+        }
+      }
+    }
+  },
+  "llm": {
+    "purpose": "低维到高维、投影与裁切类 action 定义。",
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+  }
+}

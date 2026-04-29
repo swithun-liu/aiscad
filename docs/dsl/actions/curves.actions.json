@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aiscad.dsl/actions/curves",
+  "category": "curves",
+  "produces": [
+    "curve2"
+  ],
+  "actions": {
+    "curve.line": {
+      "role": "按点序生成折线路径，可开可闭",
+      "inputKinds": [],
+      "outputKind": "curve2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "points"
+        ],
+        "properties": {
+          "points": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/point2List"
+          },
+          "closed": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+            "default": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "按点序生成折线路径，可开可闭",
+        "requiredParams": [
+          "points"
+        ],
+        "paramGuide": {
+          "points": "point2[]，二维点数组。 点列表，按顺序定义轮廓或路径。",
+          "closed": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否闭合路径或扫掠轨迹。 默认值 false。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "curve_line_example",
+          "action": "curve.line",
+          "params": {
+            "points": [
+              [
+                0,
+                0
+              ],
+              [
+                40,
+                0
+              ],
+              [
+                40,
+                20
+              ],
+              [
+                0,
+                20
+              ]
+            ],
+            "closed": false
+          }
+        }
+      }
+    },
+    "curve.arc": {
+      "role": "生成圆弧路径",
+      "inputKinds": [],
+      "outputKind": "curve2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "center",
+          "radius",
+          "startAngle",
+          "endAngle"
+        ],
+        "properties": {
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+          },
+          "radius": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "startAngle": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "endAngle": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "segments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "生成圆弧路径",
+        "requiredParams": [
+          "center",
+          "radius",
+          "startAngle",
+          "endAngle"
+        ],
+        "paramGuide": {
+          "center": "vector2，长度为 2 的数值数组。 中心点坐标。",
+          "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+          "startAngle": "number，数值，或 {\"$var\":\"变量名\"}。 起始角度，单位为度。",
+          "endAngle": "number，数值，或 {\"$var\":\"变量名\"}。 结束角度，单位为度。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "curve_arc_example",
+          "action": "curve.arc",
+          "params": {
+            "center": [
+              0,
+              0
+            ],
+            "radius": 10,
+            "startAngle": 0,
+            "endAngle": 180,
+            "segments": 32
+          }
+        }
+      }
+    },
+    "curve.bezier": {
+      "role": "按控制点生成贝塞尔路径",
+      "inputKinds": [],
+      "outputKind": "curve2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "controlPoints"
+        ],
+        "properties": {
+          "controlPoints": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/point2List"
+          },
+          "segments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "按控制点生成贝塞尔路径",
+        "requiredParams": [
+          "controlPoints"
+        ],
+        "paramGuide": {
+          "controlPoints": "point2[]，二维点数组。 控制点列表，用于贝塞尔路径。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "curve_bezier_example",
+          "action": "curve.bezier",
+          "params": {
+            "controlPoints": [
+              [
+                0,
+                0
+              ],
+              [
+                20,
+                30
+              ],
+              [
+                40,
+                0
+              ]
+            ],
+            "segments": 32
+          }
+        }
+      }
+    },
+    "curve.concat": {
+      "role": "拼接多个路径，保持路径语义",
+      "inputKinds": [
+        "curve2"
+      ],
+      "outputKind": "curve2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "sources"
+        ],
+        "properties": {
+          "sources": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/refList"
+          },
+          "closed": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+            "default": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "拼接多个路径，保持路径语义",
+        "requiredParams": [
+          "sources"
+        ],
+        "paramGuide": {
+          "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。",
+          "closed": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否闭合路径或扫掠轨迹。 默认值 false。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "curve_concat_example",
+          "action": "curve.concat",
+          "params": {
+            "sources": [
+              "path_a",
+              "path_b"
+            ],
+            "closed": false
+          }
+        }
+      }
+    },
+    "curve.close": {
+      "role": "将开路径闭合为闭路径",
+      "inputKinds": [
+        "curve2"
+      ],
+      "outputKind": "curve2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "将开路径闭合为闭路径",
+        "requiredParams": [
+          "source"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "curve_close_example",
+          "action": "curve.close",
+          "params": {
+            "source": "open_path"
+          }
+        }
+      }
+    }
+  },
+  "llm": {
+    "purpose": "二维路径与曲线 action 定义。",
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+  }
+}

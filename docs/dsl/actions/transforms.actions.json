@@ -1,0 +1,323 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aiscad.dsl/actions/transforms",
+  "category": "transforms",
+  "preservesTopology": true,
+  "actions": {
+    "transform.translate": {
+      "role": "平移几何",
+      "inputKinds": [
+        "curve2",
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "same-as-source",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "offset"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "offset": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "平移几何",
+        "requiredParams": [
+          "source",
+          "offset"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "offset": "vector3，长度为 3 的数值数组。 位移向量。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "transform_translate_example",
+          "action": "transform.translate",
+          "params": {
+            "source": "body",
+            "offset": [
+              10,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "transform.rotate": {
+      "role": "按 XYZ 欧拉角旋转几何",
+      "inputKinds": [
+        "curve2",
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "same-as-source",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "angles"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "angles": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+          },
+          "origin": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "按 XYZ 欧拉角旋转几何",
+        "requiredParams": [
+          "source",
+          "angles"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "angles": "vector3，长度为 3 的数值数组。 XYZ 欧拉角，单位为度。",
+          "origin": "vector3，长度为 3 的数值数组。 阵列起始偏移。 默认值 [0, 0, 0]。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "transform_rotate_example",
+          "action": "transform.rotate",
+          "params": {
+            "source": "body",
+            "angles": [
+              0,
+              0,
+              90
+            ],
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "transform.scale": {
+      "role": "按轴缩放几何",
+      "inputKinds": [
+        "curve2",
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "same-as-source",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "factors"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "factors": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+          },
+          "origin": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "按轴缩放几何",
+        "requiredParams": [
+          "source",
+          "factors"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "factors": "vector3，长度为 3 的数值数组。 按轴缩放倍数。",
+          "origin": "vector3，长度为 3 的数值数组。 阵列起始偏移。 默认值 [0, 0, 0]。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "transform_scale_example",
+          "action": "transform.scale",
+          "params": {
+            "source": "body",
+            "factors": [
+              1,
+              1,
+              1
+            ],
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "transform.mirror": {
+      "role": "按法向定义的镜像平面做镜像",
+      "inputKinds": [
+        "curve2",
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "same-as-source",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "plane"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "plane": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/plane"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "按法向定义的镜像平面做镜像",
+        "requiredParams": [
+          "source",
+          "plane"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "plane": "plane，对象格式为 { origin, normal }。 平面对象，格式为 { origin, normal }。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "transform_mirror_example",
+          "action": "transform.mirror",
+          "params": {
+            "source": "body",
+            "plane": {
+              "origin": [
+                0,
+                0,
+                0
+              ],
+              "normal": [
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "transform.matrix": {
+      "role": "应用 4x4 变换矩阵，作为通用兜底变换",
+      "inputKinds": [
+        "curve2",
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "same-as-source",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "matrix"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "matrix": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/matrix4x4"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "应用 4x4 变换矩阵，作为通用兜底变换",
+        "requiredParams": [
+          "source",
+          "matrix"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "matrix": "matrix4x4，4x4 数值矩阵。 4x4 变换矩阵。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "transform_matrix_example",
+          "action": "transform.matrix",
+          "params": {
+            "source": "body",
+            "matrix": [
+              [
+                1,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        }
+      }
+    }
+  },
+  "llm": {
+    "purpose": "空间变换类 action 定义。",
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+  }
+}

@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aiscad.dsl/actions/patterns",
+  "category": "patterns",
+  "actions": {
+    "pattern.linear": {
+      "role": "按单方向线性阵列复制对象",
+      "inputKinds": [
+        "curve2",
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "group",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "count",
+          "step"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "count": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          },
+          "step": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+          },
+          "origin": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "按单方向线性阵列复制对象",
+        "requiredParams": [
+          "source",
+          "count",
+          "step"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "count": "integer，整数，或 {\"$var\":\"变量名\"}。 复制次数。grid 模式必须是 [x, y, z]。",
+          "step": "vector3，长度为 3 的数值数组。 阵列步长向量。",
+          "origin": "vector3，长度为 3 的数值数组。 阵列起始偏移。 默认值 [0, 0, 0]。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "pattern_linear_example",
+          "action": "pattern.linear",
+          "params": {
+            "source": "unit",
+            "count": 4,
+            "step": [
+              20,
+              0,
+              0
+            ],
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "pattern.grid": {
+      "role": "按三轴网格阵列复制对象",
+      "inputKinds": [
+        "curve2",
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "group",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "count",
+          "step"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "count": {
+            "type": "array",
+            "items": {
+              "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "step": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+          },
+          "origin": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "按三轴网格阵列复制对象",
+        "requiredParams": [
+          "source",
+          "count",
+          "step"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "count": "array，固定长度 3。 复制次数。grid 模式必须是 [x, y, z]。",
+          "step": "vector3，长度为 3 的数值数组。 阵列步长向量。",
+          "origin": "vector3，长度为 3 的数值数组。 阵列起始偏移。 默认值 [0, 0, 0]。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "pattern_grid_example",
+          "action": "pattern.grid",
+          "params": {
+            "source": "unit",
+            "count": [
+              2,
+              2,
+              1
+            ],
+            "step": [
+              20,
+              20,
+              0
+            ],
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "pattern.radial": {
+      "role": "按圆周阵列复制对象",
+      "inputKinds": [
+        "curve2",
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "group",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "count",
+          "radius"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "count": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          },
+          "radius": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "startAngle": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue",
+            "default": 0
+          },
+          "sweepAngle": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue",
+            "default": 360
+          },
+          "axis": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/axis",
+            "default": "z"
+          },
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          },
+          "rotateItems": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+            "default": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "按圆周阵列复制对象",
+        "requiredParams": [
+          "source",
+          "count",
+          "radius"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "count": "integer，整数，或 {\"$var\":\"变量名\"}。 复制次数。grid 模式必须是 [x, y, z]。",
+          "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+          "startAngle": "number，数值，或 {\"$var\":\"变量名\"}。 起始角度，单位为度。 默认值 0。",
+          "sweepAngle": "number，数值，或 {\"$var\":\"变量名\"}。 圆周阵列的扫掠角度，单位为度。 默认值 360。",
+          "axis": "enum，只能是 x、y、z。 坐标轴，只能是 x / y / z。 默认值 \"z\"。",
+          "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。",
+          "rotateItems": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 阵列后是否同步旋转每个复制体。 默认值 true。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "pattern_radial_example",
+          "action": "pattern.radial",
+          "params": {
+            "source": "unit",
+            "count": 6,
+            "radius": 30,
+            "startAngle": 0,
+            "sweepAngle": 360,
+            "axis": "z",
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "rotateItems": true
+          }
+        }
+      }
+    }
+  },
+  "llm": {
+    "purpose": "阵列复制类 action 定义。",
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+  }
+}

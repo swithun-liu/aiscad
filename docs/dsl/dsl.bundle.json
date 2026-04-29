@@ -1,0 +1,1872 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aiscad.dsl/bundle",
+  "program": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "aiscad.dsl/program",
+    "type": "object",
+    "required": [
+      "dsl",
+      "version",
+      "units",
+      "actions",
+      "result"
+    ],
+    "properties": {
+      "dsl": {
+        "type": "string",
+        "const": "aiscad.dsl"
+      },
+      "version": {
+        "type": "string",
+        "enum": [
+          "1.0.0"
+        ]
+      },
+      "units": {
+        "type": "string",
+        "enum": [
+          "mm",
+          "cm",
+          "m",
+          "in"
+        ]
+      },
+      "precision": {
+        "type": "object",
+        "required": [
+          "eps",
+          "segments"
+        ],
+        "properties": {
+          "eps": {
+            "type": "number",
+            "minimum": 1e-06
+          },
+          "segments": {
+            "type": "integer",
+            "minimum": 3,
+            "maximum": 512
+          }
+        },
+        "additionalProperties": false,
+        "default": {
+          "eps": 0.001,
+          "segments": 32
+        }
+      },
+      "metadata": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      },
+      "variables": {
+        "type": "object",
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 4
+            }
+          ]
+        }
+      },
+      "actions": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "$ref": "#/$defs/actionNode"
+        }
+      },
+      "result": {
+        "oneOf": [
+          {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          {
+            "type": "array",
+            "items": {
+              "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+            },
+            "minItems": 1
+          }
+        ]
+      }
+    },
+    "additionalProperties": false,
+    "$defs": {
+      "actionNode": {
+        "type": "object",
+        "required": [
+          "id",
+          "action",
+          "params"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "action": {
+            "type": "string",
+            "pattern": "^[a-z]+\\.[a-zA-Z][a-zA-Z0-9]*$"
+          },
+          "params": {
+            "type": "object"
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "debug": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "common": {
+    "types": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "aiscad.dsl/actions/common.types",
+      "$defs": {
+        "ref": {
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+        },
+        "refList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ref"
+          },
+          "minItems": 1
+        },
+        "numberValue": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "object",
+              "required": [
+                "$var"
+              ],
+              "properties": {
+                "$var": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "booleanValue": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "object",
+              "required": [
+                "$var"
+              ],
+              "properties": {
+                "$var": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "stringValue": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "required": [
+                "$var"
+              ],
+              "properties": {
+                "$var": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "integerValue": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "object",
+              "required": [
+                "$var"
+              ],
+              "properties": {
+                "$var": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "vector2": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/numberValue"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "vector3": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/numberValue"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "vector4": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/numberValue"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "point2List": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/vector2"
+          },
+          "minItems": 2
+        },
+        "point3List": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/vector3"
+          },
+          "minItems": 3
+        },
+        "rgba": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "axis": {
+          "type": "string",
+          "enum": [
+            "x",
+            "y",
+            "z"
+          ]
+        },
+        "cornerStyle": {
+          "type": "string",
+          "enum": [
+            "round",
+            "chamfer",
+            "edge"
+          ]
+        },
+        "caps": {
+          "type": "string",
+          "enum": [
+            "none",
+            "start",
+            "end",
+            "both"
+          ]
+        },
+        "plane": {
+          "type": "object",
+          "required": [
+            "origin",
+            "normal"
+          ],
+          "properties": {
+            "origin": {
+              "$ref": "#/$defs/vector3"
+            },
+            "normal": {
+              "$ref": "#/$defs/vector3"
+            }
+          },
+          "additionalProperties": false
+        },
+        "matrix4x4": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/numberValue"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "curve2",
+            "geom2",
+            "geom3",
+            "group"
+          ]
+        },
+        "kindList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/kind"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    }
+  },
+  "actions": {
+    "curves": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "aiscad.dsl/actions/curves",
+      "category": "curves",
+      "produces": [
+        "curve2"
+      ],
+      "actions": {
+        "curve.line": {
+          "role": "按点序生成折线路径，可开可闭",
+          "inputKinds": [],
+          "outputKind": "curve2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "points"
+            ],
+            "properties": {
+              "points": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/point2List"
+              },
+              "closed": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+                "default": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "curve.arc": {
+          "role": "生成圆弧路径",
+          "inputKinds": [],
+          "outputKind": "curve2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "center",
+              "radius",
+              "startAngle",
+              "endAngle"
+            ],
+            "properties": {
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+              },
+              "radius": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "startAngle": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "endAngle": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "segments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "curve.bezier": {
+          "role": "按控制点生成贝塞尔路径",
+          "inputKinds": [],
+          "outputKind": "curve2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "controlPoints"
+            ],
+            "properties": {
+              "controlPoints": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/point2List"
+              },
+              "segments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "curve.concat": {
+          "role": "拼接多个路径，保持路径语义",
+          "inputKinds": [
+            "curve2"
+          ],
+          "outputKind": "curve2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "sources"
+            ],
+            "properties": {
+              "sources": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/refList"
+              },
+              "closed": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+                "default": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "curve.close": {
+          "role": "将开路径闭合为闭路径",
+          "inputKinds": [
+            "curve2"
+          ],
+          "outputKind": "curve2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "sketches": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "aiscad.dsl/actions/sketches",
+      "category": "sketches",
+      "produces": [
+        "geom2"
+      ],
+      "actions": {
+        "sketch.circle": {
+          "role": "生成圆形草图",
+          "inputKinds": [],
+          "outputKind": "geom2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "radius"
+            ],
+            "properties": {
+              "radius": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2",
+                "default": [
+                  0,
+                  0
+                ]
+              },
+              "segments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "sketch.ellipse": {
+          "role": "生成椭圆草图",
+          "inputKinds": [],
+          "outputKind": "geom2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "radius"
+            ],
+            "properties": {
+              "radius": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+              },
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2",
+                "default": [
+                  0,
+                  0
+                ]
+              },
+              "segments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "sketch.rectangle": {
+          "role": "生成矩形草图",
+          "inputKinds": [],
+          "outputKind": "geom2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "size"
+            ],
+            "properties": {
+              "size": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+              },
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2",
+                "default": [
+                  0,
+                  0
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "sketch.roundedRectangle": {
+          "role": "生成圆角或倒角矩形草图",
+          "inputKinds": [],
+          "outputKind": "geom2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "size",
+              "radius"
+            ],
+            "properties": {
+              "size": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+              },
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2",
+                "default": [
+                  0,
+                  0
+                ]
+              },
+              "radius": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "style": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/cornerStyle",
+                "default": "round"
+              },
+              "segments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "sketch.polygon": {
+          "role": "通过点集直接生成多边形草图",
+          "inputKinds": [],
+          "outputKind": "geom2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "points"
+            ],
+            "properties": {
+              "points": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/point2List"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "sketch.fromCurve": {
+          "role": "将闭合曲线转为封闭草图",
+          "inputKinds": [
+            "curve2"
+          ],
+          "outputKind": "geom2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "sketch.text": {
+          "role": "生成文本轮廓草图，适合压印和雕刻",
+          "inputKinds": [],
+          "outputKind": "geom2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "text",
+              "fontSize"
+            ],
+            "properties": {
+              "text": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/stringValue"
+              },
+              "fontSize": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "align": {
+                "type": "string",
+                "enum": [
+                  "left",
+                  "center",
+                  "right"
+                ],
+                "default": "left"
+              },
+              "lineSpacing": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "letterSpacing": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "position": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2",
+                "default": [
+                  0,
+                  0
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "solids": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "aiscad.dsl/actions/solids",
+      "category": "solids",
+      "produces": [
+        "geom3"
+      ],
+      "actions": {
+        "solid.box": {
+          "role": "生成长方体",
+          "inputKinds": [],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "size"
+            ],
+            "properties": {
+              "size": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+              },
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+                "default": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "solid.roundedBox": {
+          "role": "生成圆角或倒角长方体",
+          "inputKinds": [],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "size",
+              "radius"
+            ],
+            "properties": {
+              "size": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+              },
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+                "default": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "radius": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "style": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/cornerStyle",
+                "default": "round"
+              },
+              "segments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "solid.sphere": {
+          "role": "生成球体",
+          "inputKinds": [],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "radius"
+            ],
+            "properties": {
+              "radius": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+                "default": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "segments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "solid.geodesicSphere": {
+          "role": "生成测地球，更适合低面数稳定拓扑",
+          "inputKinds": [],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "radius"
+            ],
+            "properties": {
+              "radius": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+                "default": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "frequency": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 6
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "solid.cylinder": {
+          "role": "生成正圆柱或圆台",
+          "inputKinds": [],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "height"
+            ],
+            "properties": {
+              "height": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "radius": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "radiusTop": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "radiusBottom": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+                "default": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "segments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              }
+            },
+            "oneOf": [
+              {
+                "required": [
+                  "height",
+                  "radius"
+                ]
+              },
+              {
+                "required": [
+                  "height",
+                  "radiusTop",
+                  "radiusBottom"
+                ]
+              }
+            ],
+            "additionalProperties": false
+          }
+        },
+        "solid.ellipticalCylinder": {
+          "role": "生成椭圆截面柱体或锥台",
+          "inputKinds": [],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "height",
+              "radiusTop",
+              "radiusBottom"
+            ],
+            "properties": {
+              "height": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "radiusTop": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+              },
+              "radiusBottom": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+              },
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+                "default": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "segments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "solid.roundedCylinder": {
+          "role": "生成圆角柱体",
+          "inputKinds": [],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "height",
+              "radius",
+              "roundRadius"
+            ],
+            "properties": {
+              "height": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "radius": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "roundRadius": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+                "default": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "segments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "solid.torus": {
+          "role": "生成圆环体",
+          "inputKinds": [],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "innerRadius",
+              "outerRadius"
+            ],
+            "properties": {
+              "innerRadius": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "outerRadius": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "innerSegments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              },
+              "outerSegments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              },
+              "innerRotation": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue",
+                "default": 0
+              },
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+                "default": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "solid.polyhedron": {
+          "role": "通过顶点和面定义任意三维网格实体",
+          "inputKinds": [],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "points",
+              "faces"
+            ],
+            "properties": {
+              "points": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/point3List"
+              },
+              "faces": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "minItems": 3
+                },
+                "minItems": 1
+              },
+              "orientation": {
+                "type": "string",
+                "enum": [
+                  "outward",
+                  "inward"
+                ],
+                "default": "outward"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "construct": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "aiscad.dsl/actions/construct",
+      "category": "construct",
+      "actions": {
+        "construct.extrudeLinear": {
+          "role": "将二维草图沿法向线性拉伸成实体",
+          "inputKinds": [
+            "geom2"
+          ],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "height"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "height": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "twistAngle": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue",
+                "default": 0
+              },
+              "twistSteps": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "construct.extrudeRotate": {
+          "role": "将二维剖面绕轴旋转生成回转体",
+          "inputKinds": [
+            "geom2"
+          ],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "angle": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue",
+                "default": 360
+              },
+              "segments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              },
+              "axis": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/axis",
+                "default": "z"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "construct.extrudeRectangular": {
+          "role": "沿二维路径扫掠矩形截面",
+          "inputKinds": [
+            "curve2"
+          ],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "size"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "size": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+              },
+              "closed": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+                "default": false
+              },
+              "caps": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/caps",
+                "default": "both"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "construct.extrudeFromSlices": {
+          "role": "通过一系列切片插值生成复杂扫掠实体",
+          "inputKinds": [
+            "geom2"
+          ],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "slices"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "slices": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "offset"
+                  ],
+                  "properties": {
+                    "offset": {
+                      "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+                    },
+                    "translate": {
+                      "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+                    },
+                    "rotate": {
+                      "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+                    },
+                    "scale": {
+                      "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "close": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+                "default": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "construct.project": {
+          "role": "将三维实体投影为二维草图",
+          "inputKinds": [
+            "geom3"
+          ],
+          "outputKind": "geom2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "axis": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/axis",
+                "default": "z"
+              },
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "orthographic",
+                  "section"
+                ],
+                "default": "orthographic"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "construct.sectionByPlane": {
+          "role": "按平面切出二维截面",
+          "inputKinds": [
+            "geom3"
+          ],
+          "outputKind": "geom2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "plane"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "plane": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/plane"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "construct.cutByPlane": {
+          "role": "按平面裁掉实体一侧",
+          "inputKinds": [
+            "geom3"
+          ],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "plane",
+              "keep"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "plane": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/plane"
+              },
+              "keep": {
+                "type": "string",
+                "enum": [
+                  "positive",
+                  "negative"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "transforms": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "aiscad.dsl/actions/transforms",
+      "category": "transforms",
+      "preservesTopology": true,
+      "actions": {
+        "transform.translate": {
+          "role": "平移几何",
+          "inputKinds": [
+            "curve2",
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "same-as-source",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "offset"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "offset": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "transform.rotate": {
+          "role": "按 XYZ 欧拉角旋转几何",
+          "inputKinds": [
+            "curve2",
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "same-as-source",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "angles"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "angles": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+              },
+              "origin": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+                "default": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "transform.scale": {
+          "role": "按轴缩放几何",
+          "inputKinds": [
+            "curve2",
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "same-as-source",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "factors"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "factors": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+              },
+              "origin": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+                "default": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "transform.mirror": {
+          "role": "按法向定义的镜像平面做镜像",
+          "inputKinds": [
+            "curve2",
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "same-as-source",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "plane"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "plane": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/plane"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "transform.matrix": {
+          "role": "应用 4x4 变换矩阵，作为通用兜底变换",
+          "inputKinds": [
+            "curve2",
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "same-as-source",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "matrix"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "matrix": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/matrix4x4"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "booleans": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "aiscad.dsl/actions/booleans",
+      "category": "booleans",
+      "actions": {
+        "boolean.union": {
+          "role": "并集组合多个同维几何",
+          "inputKinds": [
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "same-dimension",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "sources"
+            ],
+            "properties": {
+              "sources": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/refList"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "boolean.subtract": {
+          "role": "从基体中减去一个或多个工具体",
+          "inputKinds": [
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "same-dimension-as-base",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "base",
+              "tools"
+            ],
+            "properties": {
+              "base": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "tools": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/refList"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "boolean.intersect": {
+          "role": "求多个同维几何的交集",
+          "inputKinds": [
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "same-dimension",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "sources"
+            ],
+            "properties": {
+              "sources": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/refList"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "modifiers": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "aiscad.dsl/actions/modifiers",
+      "category": "modifiers",
+      "actions": {
+        "modify.offset2d": {
+          "role": "对二维草图做偏移，适合壁厚、轮廓扩边",
+          "inputKinds": [
+            "geom2"
+          ],
+          "outputKind": "geom2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "distance"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "distance": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "corners": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/cornerStyle",
+                "default": "round"
+              },
+              "segments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "modify.expand2d": {
+          "role": "对二维草图做实体化膨胀",
+          "inputKinds": [
+            "geom2"
+          ],
+          "outputKind": "geom2",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "delta"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "delta": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "corners": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/cornerStyle",
+                "default": "round"
+              },
+              "segments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "modify.expand3d": {
+          "role": "对三维实体做外扩或内缩",
+          "inputKinds": [
+            "geom3"
+          ],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "delta"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "delta": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "corners": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/cornerStyle",
+                "default": "round"
+              },
+              "segments": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "modify.hull": {
+          "role": "对多个对象求凸包",
+          "inputKinds": [
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "same-dimension",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "sources"
+            ],
+            "properties": {
+              "sources": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/refList"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "modify.hullChain": {
+          "role": "按顺序对对象链逐段求凸包并合并",
+          "inputKinds": [
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "same-dimension",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "sources"
+            ],
+            "properties": {
+              "sources": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/refList"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "modify.generalize": {
+          "role": "几何清理与简化，去除冗余点、退化边和近重复面",
+          "inputKinds": [
+            "geom2",
+            "geom3"
+          ],
+          "outputKind": "same-as-source",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "snap": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+                "default": true
+              },
+              "simplify": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+                "default": false
+              },
+              "triangulate": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+                "default": false
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "patterns": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "aiscad.dsl/actions/patterns",
+      "category": "patterns",
+      "actions": {
+        "pattern.linear": {
+          "role": "按单方向线性阵列复制对象",
+          "inputKinds": [
+            "curve2",
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "group",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "count",
+              "step"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "count": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              },
+              "step": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+              },
+              "origin": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+                "default": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "pattern.grid": {
+          "role": "按三轴网格阵列复制对象",
+          "inputKinds": [
+            "curve2",
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "group",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "count",
+              "step"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "count": {
+                "type": "array",
+                "items": {
+                  "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "step": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+              },
+              "origin": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+                "default": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "pattern.radial": {
+          "role": "按圆周阵列复制对象",
+          "inputKinds": [
+            "curve2",
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "group",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "count",
+              "radius"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "count": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+              },
+              "radius": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+              },
+              "startAngle": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue",
+                "default": 0
+              },
+              "sweepAngle": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue",
+                "default": 360
+              },
+              "axis": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/axis",
+                "default": "z"
+              },
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+                "default": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "rotateItems": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+                "default": true
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "display": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "aiscad.dsl/actions/display",
+      "category": "display",
+      "actions": {
+        "display.color": {
+          "role": "给几何附加预览颜色，不改变几何本体",
+          "inputKinds": [
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "same-as-source",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "source",
+              "rgba"
+            ],
+            "properties": {
+              "source": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+              },
+              "rgba": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/rgba"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "display.group": {
+          "role": "把多个对象组织成一个逻辑输出组",
+          "inputKinds": [
+            "curve2",
+            "geom2",
+            "geom3",
+            "group"
+          ],
+          "outputKind": "group",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "sources"
+            ],
+            "properties": {
+              "sources": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/refList"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  }
+}

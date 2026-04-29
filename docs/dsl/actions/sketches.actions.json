@@ -1,0 +1,401 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aiscad.dsl/actions/sketches",
+  "category": "sketches",
+  "produces": [
+    "geom2"
+  ],
+  "actions": {
+    "sketch.circle": {
+      "role": "生成圆形草图",
+      "inputKinds": [],
+      "outputKind": "geom2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "radius"
+        ],
+        "properties": {
+          "radius": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2",
+            "default": [
+              0,
+              0
+            ]
+          },
+          "segments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "生成圆形草图",
+        "requiredParams": [
+          "radius"
+        ],
+        "paramGuide": {
+          "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+          "center": "vector2，长度为 2 的数值数组。 中心点坐标。 默认值 [0, 0]。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "sketch_circle_example",
+          "action": "sketch.circle",
+          "params": {
+            "radius": 12,
+            "center": [
+              0,
+              0
+            ],
+            "segments": 32
+          }
+        }
+      }
+    },
+    "sketch.ellipse": {
+      "role": "生成椭圆草图",
+      "inputKinds": [],
+      "outputKind": "geom2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "radius"
+        ],
+        "properties": {
+          "radius": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+          },
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2",
+            "default": [
+              0,
+              0
+            ]
+          },
+          "segments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "生成椭圆草图",
+        "requiredParams": [
+          "radius"
+        ],
+        "paramGuide": {
+          "radius": "vector2，长度为 2 的数值数组。 半径。",
+          "center": "vector2，长度为 2 的数值数组。 中心点坐标。 默认值 [0, 0]。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "sketch_ellipse_example",
+          "action": "sketch.ellipse",
+          "params": {
+            "radius": [
+              20,
+              10
+            ],
+            "center": [
+              0,
+              0
+            ],
+            "segments": 32
+          }
+        }
+      }
+    },
+    "sketch.rectangle": {
+      "role": "生成矩形草图",
+      "inputKinds": [],
+      "outputKind": "geom2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "size"
+        ],
+        "properties": {
+          "size": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+          },
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2",
+            "default": [
+              0,
+              0
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "生成矩形草图",
+        "requiredParams": [
+          "size"
+        ],
+        "paramGuide": {
+          "size": "vector2，长度为 2 的数值数组。 尺寸向量。2D 时为 [x, y]，3D 时为 [x, y, z]。",
+          "center": "vector2，长度为 2 的数值数组。 中心点坐标。 默认值 [0, 0]。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "sketch_rectangle_example",
+          "action": "sketch.rectangle",
+          "params": {
+            "size": [
+              40,
+              20
+            ],
+            "center": [
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "sketch.roundedRectangle": {
+      "role": "生成圆角或倒角矩形草图",
+      "inputKinds": [],
+      "outputKind": "geom2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "size",
+          "radius"
+        ],
+        "properties": {
+          "size": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2"
+          },
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2",
+            "default": [
+              0,
+              0
+            ]
+          },
+          "radius": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "style": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/cornerStyle",
+            "default": "round"
+          },
+          "segments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "生成圆角或倒角矩形草图",
+        "requiredParams": [
+          "size",
+          "radius"
+        ],
+        "paramGuide": {
+          "size": "vector2，长度为 2 的数值数组。 尺寸向量。2D 时为 [x, y]，3D 时为 [x, y, z]。",
+          "center": "vector2，长度为 2 的数值数组。 中心点坐标。 默认值 [0, 0]。",
+          "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+          "style": "enum，可选值为 round / chamfer / edge。 默认值 \"round\"。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "sketch_roundedRectangle_example",
+          "action": "sketch.roundedRectangle",
+          "params": {
+            "size": [
+              40,
+              20
+            ],
+            "center": [
+              0,
+              0
+            ],
+            "radius": 4,
+            "style": "round",
+            "segments": 32
+          }
+        }
+      }
+    },
+    "sketch.polygon": {
+      "role": "通过点集直接生成多边形草图",
+      "inputKinds": [],
+      "outputKind": "geom2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "points"
+        ],
+        "properties": {
+          "points": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/point2List"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "通过点集直接生成多边形草图",
+        "requiredParams": [
+          "points"
+        ],
+        "paramGuide": {
+          "points": "point2[]，二维点数组。 点列表，按顺序定义轮廓或路径。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "sketch_polygon_example",
+          "action": "sketch.polygon",
+          "params": {
+            "points": [
+              [
+                0,
+                0
+              ],
+              [
+                40,
+                0
+              ],
+              [
+                30,
+                20
+              ],
+              [
+                0,
+                20
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "sketch.fromCurve": {
+      "role": "将闭合曲线转为封闭草图",
+      "inputKinds": [
+        "curve2"
+      ],
+      "outputKind": "geom2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "将闭合曲线转为封闭草图",
+        "requiredParams": [
+          "source"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "sketch_fromCurve_example",
+          "action": "sketch.fromCurve",
+          "params": {
+            "source": "closed_path"
+          }
+        }
+      }
+    },
+    "sketch.text": {
+      "role": "生成文本轮廓草图，适合压印和雕刻",
+      "inputKinds": [],
+      "outputKind": "geom2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "text",
+          "fontSize"
+        ],
+        "properties": {
+          "text": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/stringValue"
+          },
+          "fontSize": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "align": {
+            "type": "string",
+            "enum": [
+              "left",
+              "center",
+              "right"
+            ],
+            "default": "left"
+          },
+          "lineSpacing": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "letterSpacing": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "position": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector2",
+            "default": [
+              0,
+              0
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": false,
+        "summary": "生成文本轮廓草图，适合压印和雕刻",
+        "requiredParams": [
+          "text",
+          "fontSize"
+        ],
+        "paramGuide": {
+          "text": "string，字符串，或 {\"$var\":\"变量名\"}。 文本内容。",
+          "fontSize": "number，数值，或 {\"$var\":\"变量名\"}。 字体尺寸。",
+          "align": "enum，可选值：left / center / right。 文本对齐方式。 默认值 \"left\"。",
+          "lineSpacing": "number，数值，或 {\"$var\":\"变量名\"}。 行间距。",
+          "letterSpacing": "number，数值，或 {\"$var\":\"变量名\"}。 字间距。",
+          "position": "vector2，长度为 2 的数值数组。 文本位置。 默认值 [0, 0]。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "sketch_text_example",
+          "action": "sketch.text",
+          "params": {
+            "text": "AISCAD",
+            "fontSize": 12,
+            "align": "center",
+            "position": [
+              0,
+              0
+            ]
+          }
+        }
+      }
+    }
+  },
+  "llm": {
+    "purpose": "二维封闭草图 action 定义。",
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+  }
+}

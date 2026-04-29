@@ -1,0 +1,317 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aiscad.dsl/actions/modifiers",
+  "category": "modifiers",
+  "actions": {
+    "modify.offset2d": {
+      "role": "对二维草图做偏移，适合壁厚、轮廓扩边",
+      "inputKinds": [
+        "geom2"
+      ],
+      "outputKind": "geom2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "distance"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "distance": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "corners": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/cornerStyle",
+            "default": "round"
+          },
+          "segments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "对二维草图做偏移，适合壁厚、轮廓扩边",
+        "requiredParams": [
+          "source",
+          "distance"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "distance": "number，数值，或 {\"$var\":\"变量名\"}。 二维偏移距离。",
+          "corners": "enum，可选值为 round / chamfer / edge。 角处理方式。 默认值 \"round\"。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "modify_offset2d_example",
+          "action": "modify.offset2d",
+          "params": {
+            "source": "profile",
+            "distance": 2,
+            "corners": "round",
+            "segments": 32
+          }
+        }
+      }
+    },
+    "modify.expand2d": {
+      "role": "对二维草图做实体化膨胀",
+      "inputKinds": [
+        "geom2"
+      ],
+      "outputKind": "geom2",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "delta"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "delta": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "corners": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/cornerStyle",
+            "default": "round"
+          },
+          "segments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "对二维草图做实体化膨胀",
+        "requiredParams": [
+          "source",
+          "delta"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "delta": "number，数值，或 {\"$var\":\"变量名\"}。 扩张或收缩距离。",
+          "corners": "enum，可选值为 round / chamfer / edge。 角处理方式。 默认值 \"round\"。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "modify_expand2d_example",
+          "action": "modify.expand2d",
+          "params": {
+            "source": "profile",
+            "delta": 2,
+            "corners": "round",
+            "segments": 32
+          }
+        }
+      }
+    },
+    "modify.expand3d": {
+      "role": "对三维实体做外扩或内缩",
+      "inputKinds": [
+        "geom3"
+      ],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source",
+          "delta"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "delta": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
+          },
+          "corners": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/cornerStyle",
+            "default": "round"
+          },
+          "segments": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "对三维实体做外扩或内缩",
+        "requiredParams": [
+          "source",
+          "delta"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "delta": "number，数值，或 {\"$var\":\"变量名\"}。 扩张或收缩距离。",
+          "corners": "enum，可选值为 round / chamfer / edge。 角处理方式。 默认值 \"round\"。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "modify_expand3d_example",
+          "action": "modify.expand3d",
+          "params": {
+            "source": "body",
+            "delta": 2,
+            "corners": "round",
+            "segments": 32
+          }
+        }
+      }
+    },
+    "modify.hull": {
+      "role": "对多个对象求凸包",
+      "inputKinds": [
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "same-dimension",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "sources"
+        ],
+        "properties": {
+          "sources": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/refList"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "对多个对象求凸包",
+        "requiredParams": [
+          "sources"
+        ],
+        "paramGuide": {
+          "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "modify_hull_example",
+          "action": "modify.hull",
+          "params": {
+            "sources": [
+              "part_a",
+              "part_b"
+            ]
+          }
+        }
+      }
+    },
+    "modify.hullChain": {
+      "role": "按顺序对对象链逐段求凸包并合并",
+      "inputKinds": [
+        "geom2",
+        "geom3",
+        "group"
+      ],
+      "outputKind": "same-dimension",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "sources"
+        ],
+        "properties": {
+          "sources": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/refList"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "按顺序对对象链逐段求凸包并合并",
+        "requiredParams": [
+          "sources"
+        ],
+        "paramGuide": {
+          "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "modify_hullChain_example",
+          "action": "modify.hullChain",
+          "params": {
+            "sources": [
+              "part_a",
+              "part_b",
+              "part_c"
+            ]
+          }
+        }
+      }
+    },
+    "modify.generalize": {
+      "role": "几何清理与简化，去除冗余点、退化边和近重复面",
+      "inputKinds": [
+        "geom2",
+        "geom3"
+      ],
+      "outputKind": "same-as-source",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "source"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "snap": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+            "default": true
+          },
+          "simplify": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+            "default": false
+          },
+          "triangulate": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/booleanValue",
+            "default": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "几何清理与简化，去除冗余点、退化边和近重复面",
+        "requiredParams": [
+          "source"
+        ],
+        "paramGuide": {
+          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+          "snap": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否吸附近邻点，减少几何噪声。 默认值 true。",
+          "simplify": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否做几何简化。 默认值 false。",
+          "triangulate": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否三角化输出网格。 默认值 false。"
+        },
+        "constraints": [],
+        "example": {
+          "id": "modify_generalize_example",
+          "action": "modify.generalize",
+          "params": {
+            "source": "body",
+            "snap": true,
+            "simplify": false,
+            "triangulate": false
+          }
+        }
+      }
+    }
+  },
+  "llm": {
+    "purpose": "偏移、扩张、凸包、清理类 action 定义。",
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aiscad.dsl/program",
+  "type": "object",
+  "required": [
+    "dsl",
+    "version",
+    "units",
+    "actions",
+    "result"
+  ],
+  "properties": {
+    "dsl": {
+      "type": "string",
+      "const": "aiscad.dsl"
+    },
+    "version": {
+      "type": "string",
+      "enum": [
+        "1.0.0"
+      ]
+    },
+    "units": {
+      "type": "string",
+      "enum": [
+        "mm",
+        "cm",
+        "m",
+        "in"
+      ]
+    },
+    "precision": {
+      "type": "object",
+      "required": [
+        "eps",
+        "segments"
+      ],
+      "properties": {
+        "eps": {
+          "type": "number",
+          "minimum": 1e-06
+        },
+        "segments": {
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 512
+        }
+      },
+      "additionalProperties": false,
+      "default": {
+        "eps": 0.001,
+        "segments": 32
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "author": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "variables": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "string"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 4
+          }
+        ]
+      }
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/actionNode"
+      }
+    },
+    "result": {
+      "oneOf": [
+        {
+          "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+          },
+          "minItems": 1
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "actionNode": {
+      "type": "object",
+      "required": [
+        "id",
+        "action",
+        "params"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "aiscad.dsl/actions/common.types#/$defs/ref"
+        },
+        "action": {
+          "type": "string",
+          "pattern": "^[a-z]+\\.[a-zA-Z][a-zA-Z0-9]*$"
+        },
+        "params": {
+          "type": "object"
+        },
+        "meta": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "debug": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
