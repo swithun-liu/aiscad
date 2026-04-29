@@ -3,6 +3,8 @@ import { actionDefinitions } from './lib/dsl/definitions.js'
 import { validateAndCompileProgram } from './lib/dsl/compiler.js'
 import { buildDslPrompt, SUPPORTED_ACTION_NAMES } from './lib/dsl/prompt.js'
 import { ThreeCadViewer } from './lib/renderer/three-viewer.js'
+import { VISUAL_TEST_CASES, getVisualTestCase } from './lib/testing/cases.js'
+import { runVisualTestCase, runVisualTestCases } from './lib/testing/runner.js'
 
 const STORAGE_KEYS = {
   apiKey: 'aiscad.deepseekApiKey',
@@ -10,9 +12,9 @@ const STORAGE_KEYS = {
   description: 'aiscad.lastDescription',
 }
 
-const EXAMPLE_DESCRIPTION = '生成一个 120x80x10 mm 的底板，四角各有一个直径 6 mm 的穿孔，孔中心距离边缘 10 mm，整体显示蓝色。'
+export const EXAMPLE_DESCRIPTION = '生成一个 120x80x10 mm 的底板，四角各有一个直径 6 mm 的穿孔，孔中心距离边缘 10 mm，整体显示蓝色。'
 
-const EXAMPLE_PROGRAM = {
+export const EXAMPLE_PROGRAM = {
   dsl: 'aiscad.dsl',
   version: '1.0.0',
   units: 'mm',
@@ -96,7 +98,7 @@ function readField(key, fallback = '') {
   return localStorage.getItem(key) || fallback
 }
 
-function buildStlFileName(description) {
+export function buildStlFileName(description) {
   const baseName = (description || 'aiscad-model')
     .trim()
     .replace(/[\\/:*?"<>|]+/g, '-')
@@ -109,6 +111,64 @@ function collectSupportedActions() {
   return SUPPORTED_ACTION_NAMES
     .map((name) => `<li><code>${name}</code> - ${actionDefinitions[name].role}</li>`)
     .join('')
+}
+
+function formatMetricValue(value) {
+  if (value == null) return '-'
+  if (typeof value === 'number') return String(value)
+  return JSON.stringify(value)
+}
+
+function renderVisualLab(root, state) {
+  const summary = el('[data-role="test-summary"]', root)
+  const list = el('[data-role="test-cases"]', root)
+
+  if (!state.results.length) {
+    summary.textContent = '点击“运行全部案例”后，会在这里展示断言结果。'
+  } else {
+    const passedCount = state.results.filter((item) => item.passed).length
+    summary.textContent = `共 ${state.results.length} 个案例，通过 ${passedCount} 个，失败 ${state.results.length - passedCount} 个。`
+  }
+
+  list.innerHTML = VISUAL_TEST_CASES.map((testCase) => {
+    const result = state.results.find((item) => item.caseId === testCase.id)
+    const passClass = !result ? 'pending' : result.passed ? 'pass' : 'fail'
+    const metrics = result?.metrics
+    const assertions = result?.assertions || []
+
+    return `
+      <article class="test-case ${state.activeCaseId === testCase.id ? 'active' : ''}" data-case-id="${testCase.id}">
+        <div class="test-case-header">
+          <div>
+            <h3>${testCase.name}</h3>
+            <p class="muted">${testCase.description}</p>
+          </div>
+          <span class="test-badge ${passClass}">
+            ${!result ? '未运行' : result.passed ? '通过' : '失败'}
+          </span>
+        </div>
+        <div class="test-case-actions">
+          <button data-action="preview-case" data-case-id="${testCase.id}">预览案例</button>
+          <button data-action="load-case" data-case-id="${testCase.id}">载入 JSON</button>
+        </div>
+        <div class="test-metrics">
+          <span>类型：${formatMetricValue(metrics?.resultKinds)}</span>
+          <span>尺寸：${formatMetricValue(metrics?.bboxSize)}</span>
+          <span>体积：${formatMetricValue(metrics?.volume)}</span>
+        </div>
+        <ul class="assertion-list">
+          ${assertions.length
+            ? assertions.map((assertion) => `
+                <li class="${assertion.pass ? 'pass' : 'fail'}">
+                  <strong>${assertion.pass ? 'PASS' : 'FAIL'}</strong>
+                  <span>${assertion.label}：${assertion.detail}</span>
+                </li>
+              `).join('')
+            : '<li class="pending"><span>尚未运行断言</span></li>'}
+        </ul>
+      </article>
+    `
+  }).join('')
 }
 
 async function copyText(text) {
@@ -142,7 +202,18 @@ async function renderProgram(root, viewer, source) {
   return result
 }
 
-export function createApp(root) {
+function loadProgramIntoEditor(root, descriptionInput, jsonEditor, testCase) {
+  descriptionInput.value = testCase.description
+  persistField(STORAGE_KEYS.description, descriptionInput.value)
+  jsonEditor.value = formatJson(testCase.program)
+}
+
+export function createApp(root, dependencies = {}) {
+  const generateDsl = dependencies.generateDslWithDeepSeek || generateDslWithDeepSeek
+  const buildPrompt = dependencies.buildDslPrompt || buildDslPrompt
+  const createViewer = dependencies.createViewer || ((container) => new ThreeCadViewer(container))
+  const copy = dependencies.copyText || copyText
+
   root.innerHTML = `
     <div class="app-shell">
       <aside class="sidebar card">
@@ -207,6 +278,16 @@ export function createApp(root) {
             <span class="muted">Three.js 渲染 JSCAD 几何</span>
           </div>
           <div class="viewer" data-role="viewer"></div>
+          <section class="test-lab card nested-card">
+            <div class="panel-header compact-header">
+              <h2>测试案例</h2>
+              <div class="button-row compact">
+                <button data-action="run-all-cases">运行全部案例</button>
+              </div>
+            </div>
+            <p class="muted" data-role="test-summary">点击“运行全部案例”后，会在这里展示断言结果。</p>
+            <div class="test-case-list" data-role="test-cases"></div>
+          </section>
         </section>
       </main>
     </div>
@@ -216,12 +297,17 @@ export function createApp(root) {
   const modelInput = el('[data-role="model"]', root)
   const descriptionInput = el('[data-role="description"]', root)
   const jsonEditor = el('[data-role="json-editor"]', root)
-  const viewer = new ThreeCadViewer(el('[data-role="viewer"]', root))
+  const viewer = createViewer(el('[data-role="viewer"]', root))
+  const visualLabState = {
+    activeCaseId: VISUAL_TEST_CASES[0]?.id || null,
+    results: [],
+  }
 
   apiKeyInput.value = readField(STORAGE_KEYS.apiKey)
   modelInput.value = readField(STORAGE_KEYS.model, 'deepseek-chat')
   descriptionInput.value = readField(STORAGE_KEYS.description, EXAMPLE_DESCRIPTION)
   jsonEditor.value = formatJson(EXAMPLE_PROGRAM)
+  renderVisualLab(root, visualLabState)
 
   apiKeyInput.addEventListener('change', () => persistField(STORAGE_KEYS.apiKey, apiKeyInput.value.trim()))
   modelInput.addEventListener('change', () => persistField(STORAGE_KEYS.model, modelInput.value.trim()))
@@ -238,7 +324,7 @@ export function createApp(root) {
       if (!description) {
         throw new Error('请先填写模型描述，再复制 Prompt')
       }
-      await copyText(buildDslPrompt(description))
+      await copy(buildPrompt(description))
       setError(root)
       setStatus(root, '完整 Prompt 已复制，可直接发给任意 chat AI 生成 DSL JSON。', 'success')
     } catch (error) {
@@ -250,6 +336,76 @@ export function createApp(root) {
   el('[data-action="load-example-json"]', root).addEventListener('click', async () => {
     jsonEditor.value = formatJson(EXAMPLE_PROGRAM)
     await renderProgram(root, viewer, EXAMPLE_PROGRAM)
+  })
+
+  el('[data-action="run-all-cases"]', root).addEventListener('click', async () => {
+    try {
+      setError(root)
+      setStatus(root, '正在运行可视化测试案例...', 'loading')
+      visualLabState.results = runVisualTestCases(VISUAL_TEST_CASES)
+      renderVisualLab(root, visualLabState)
+
+      const activeCase = getVisualTestCase(visualLabState.activeCaseId) || VISUAL_TEST_CASES[0]
+      const activeResult = visualLabState.results.find((item) => item.caseId === activeCase?.id)
+      if (activeCase && activeResult?.compiled) {
+        loadProgramIntoEditor(root, descriptionInput, jsonEditor, activeCase)
+        viewer.render(activeResult.compiled.renderables)
+      }
+
+      const failedCount = visualLabState.results.filter((item) => !item.passed).length
+      setStatus(root, failedCount === 0 ? '测试案例全部通过，可直接点击单个案例肉眼检查效果。' : `测试案例运行完成，失败 ${failedCount} 个。`, failedCount === 0 ? 'success' : 'error')
+    } catch (error) {
+      setError(root, error instanceof Error ? error.message : String(error))
+      setStatus(root, '运行测试案例失败', 'error')
+    }
+  })
+
+  el('[data-role="test-cases"]', root).addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-case-id]')
+    if (!button) return
+
+    const testCase = getVisualTestCase(button.dataset.caseId)
+    if (!testCase) return
+
+    visualLabState.activeCaseId = testCase.id
+
+    if (button.dataset.action === 'load-case') {
+      loadProgramIntoEditor(root, descriptionInput, jsonEditor, testCase)
+      renderVisualLab(root, visualLabState)
+      setError(root)
+      setStatus(root, `已载入测试案例“${testCase.name}”到 JSON 编辑器。`, 'success')
+      return
+    }
+
+    try {
+      const result = runVisualTestCase(testCase)
+      visualLabState.results = [
+        ...visualLabState.results.filter((item) => item.caseId !== testCase.id),
+        result,
+      ]
+      loadProgramIntoEditor(root, descriptionInput, jsonEditor, testCase)
+      viewer.render(result.compiled.renderables)
+      renderVisualLab(root, visualLabState)
+      setError(root)
+      setStatus(root, `已预览测试案例“${testCase.name}”，你可以直接肉眼检查模型效果。`, result.passed ? 'success' : 'error')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      visualLabState.results = [
+        ...visualLabState.results.filter((item) => item.caseId !== testCase.id),
+        {
+          caseId: testCase.id,
+          name: testCase.name,
+          description: testCase.description,
+          compiled: null,
+          metrics: null,
+          assertions: [{ pass: false, label: '执行结果', detail: message }],
+          passed: false,
+        },
+      ]
+      renderVisualLab(root, visualLabState)
+      setError(root, message)
+      setStatus(root, `测试案例“${testCase.name}”运行失败`, 'error')
+    }
   })
 
   el('[data-action="export-stl"]', root).addEventListener('click', () => {
@@ -279,7 +435,7 @@ export function createApp(root) {
     setStatus(root, '正在请求 DeepSeek 生成 DSL...', 'loading')
 
     try {
-      const program = await generateDslWithDeepSeek({
+      const program = await generateDsl({
         apiKey: apiKeyInput.value.trim(),
         model: modelInput.value.trim() || 'deepseek-chat',
         description: descriptionInput.value.trim(),
@@ -298,4 +454,11 @@ export function createApp(root) {
     setError(root, error instanceof Error ? error.message : String(error))
     setStatus(root, '初始化失败', 'error')
   })
+
+  try {
+    visualLabState.results = runVisualTestCases(VISUAL_TEST_CASES)
+    renderVisualLab(root, visualLabState)
+  } catch (error) {
+    setError(root, error instanceof Error ? error.message : String(error))
+  }
 }
