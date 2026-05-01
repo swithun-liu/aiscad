@@ -2,10 +2,11 @@ import Ajv2020 from 'ajv/dist/2020.js'
 import modelingModule from '@jscad/modeling'
 import { actionDefinitions, actionSets, commonTypesSchema } from './definitions.js'
 import { SUPPORTED_ACTION_NAMES } from './prompt.js'
+import { analyzeProgramStrategy } from './strategy.js'
 
 const modeling = modelingModule.default || modelingModule
-const { booleans, colors, curves, expansions, extrusions, geometries, hulls, modifiers, primitives, transforms, utils } = modeling
-const { geom2, geom3, path2 } = geometries
+const { booleans, expansions, extrusions, geometries, hulls, modifiers, primitives, transforms, utils } = modeling
+const { geom2, path2 } = geometries
 const { degToRad } = utils
 
 const SUPPORTED_ACTION_SET = new Set(SUPPORTED_ACTION_NAMES)
@@ -151,16 +152,6 @@ function requireSingleRecord(id, state) {
     throw new Error(`当前 action 需要单个对象，但 ${id} 是 group`) 
   }
   return record
-}
-
-function ensureKinds(record, allowedKinds, actionName) {
-  const records = flattenRecords(record)
-  for (const item of records) {
-    if (!allowedKinds.includes(item.kind)) {
-      throw new Error(`${actionName} 不支持输入类型 ${item.kind}`)
-    }
-  }
-  return records
 }
 
 function applyTransformToRecord(record, transformFn) {
@@ -542,11 +533,13 @@ export function validateAndCompileProgram(program) {
 
   const resultIds = Array.isArray(workingProgram.result) ? workingProgram.result : [workingProgram.result]
   const resultRecords = resultIds.map((id) => requireRecord(id, state))
+  const strategyWarnings = analyzeProgramStrategy(workingProgram, resultRecords)
   return {
     program: workingProgram,
     state,
     resultRecords,
     renderables: resultRecords.flatMap(recordToRenderable),
     supportedActions: [...SUPPORTED_ACTION_SET],
+    strategyWarnings,
   }
 }

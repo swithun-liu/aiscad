@@ -33,6 +33,36 @@
           "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要组合、去料、求交时使用。",
+          "主体和特征都已清晰独立建好后，再进入布尔阶段。"
+        ],
+        "whenNotToUse": [
+          "不要把布尔当成生成复杂结构的唯一手段。",
+          "不要在对象仍然语义混乱时连续叠加多层布尔。"
+        ],
+        "commonMistakes": [
+          "输入对象维度不一致。",
+          "把超大阵列直接作为布尔工具体，增加失败或结果失控风险。",
+          "共面、贴边或几乎不相交的对象直接做布尔。"
+        ],
+        "recommendedBefore": [
+          "solid.box",
+          "construct.extrudeLinear",
+          "transform.translate",
+          "pattern.grid"
+        ],
+        "recommendedAfter": [
+          "display.color",
+          "modify.generalize",
+          "transform.translate"
+        ],
+        "stabilityNotes": [
+          "优先先得到清晰 base，再用较少且明确的 tools/sources 做布尔。",
+          "布尔适合孔槽、拼接去料、实体拼合，不适合承担全部结构生成责任。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
+        "outputMeaning": "输出类型为 same-dimension，需结合上下文理解后续用法。",
         "example": {
           "id": "boolean_union_example",
           "action": "boolean.union",
@@ -81,6 +111,42 @@
           "tools": "ref[]，字符串数组，引用多个前序 action 的 id。 减法工具体引用数组。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要组合、去料、求交时使用。",
+          "主体和特征都已清晰独立建好后，再进入布尔阶段。",
+          "适合明确的开孔、开槽、型腔去料或从 base 中减去清晰特征。"
+        ],
+        "whenNotToUse": [
+          "不要把布尔当成生成复杂结构的唯一手段。",
+          "不要在对象仍然语义混乱时连续叠加多层布尔。",
+          "不要把它当成轻量化骨架生成的唯一路径。"
+        ],
+        "commonMistakes": [
+          "输入对象维度不一致。",
+          "把超大阵列直接作为布尔工具体，增加失败或结果失控风险。",
+          "共面、贴边或几乎不相交的对象直接做布尔。",
+          "base 仍是 2D 草图却被当成最终 3D 结果理解。",
+          "tools 数量很大时仍直接一次性减去全部阵列实例。"
+        ],
+        "recommendedBefore": [
+          "solid.box",
+          "construct.extrudeLinear",
+          "transform.translate",
+          "pattern.grid",
+          "pattern.linear"
+        ],
+        "recommendedAfter": [
+          "display.color",
+          "modify.generalize",
+          "transform.translate"
+        ],
+        "stabilityNotes": [
+          "优先先得到清晰 base，再用较少且明确的 tools/sources 做布尔。",
+          "布尔适合孔槽、拼接去料、实体拼合，不适合承担全部结构生成责任。",
+          "如果 tools 来自大阵列，先确保阵列范围、间距和作用区域是可控的。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
+        "outputMeaning": "输出类型为 same-dimension-as-base，需结合上下文理解后续用法。",
         "example": {
           "id": "boolean_subtract_example",
           "action": "boolean.subtract",
@@ -123,6 +189,36 @@
           "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要组合、去料、求交时使用。",
+          "主体和特征都已清晰独立建好后，再进入布尔阶段。"
+        ],
+        "whenNotToUse": [
+          "不要把布尔当成生成复杂结构的唯一手段。",
+          "不要在对象仍然语义混乱时连续叠加多层布尔。"
+        ],
+        "commonMistakes": [
+          "输入对象维度不一致。",
+          "把超大阵列直接作为布尔工具体，增加失败或结果失控风险。",
+          "共面、贴边或几乎不相交的对象直接做布尔。"
+        ],
+        "recommendedBefore": [
+          "solid.box",
+          "construct.extrudeLinear",
+          "transform.translate",
+          "pattern.grid"
+        ],
+        "recommendedAfter": [
+          "display.color",
+          "modify.generalize",
+          "transform.translate"
+        ],
+        "stabilityNotes": [
+          "优先先得到清晰 base，再用较少且明确的 tools/sources 做布尔。",
+          "布尔适合孔槽、拼接去料、实体拼合，不适合承担全部结构生成责任。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
+        "outputMeaning": "输出类型为 same-dimension，需结合上下文理解后续用法。",
         "example": {
           "id": "boolean_intersect_example",
           "action": "boolean.intersect",
@@ -138,6 +234,12 @@
   },
   "llm": {
     "purpose": "布尔运算类 action 定义。",
-    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+    "actionReadingOrder": [
+      "先看 summary 判断作用。",
+      "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+      "再按 requiredParams 与 paramGuide 填参数。",
+      "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+    ]
   }
 }

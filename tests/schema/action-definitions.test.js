@@ -16,6 +16,12 @@ describe('DSL action definitions', () => {
       expect(definition.llm, `${actionName} 缺少 llm`).toBeTruthy()
       expect(definition.llm.summary, `${actionName} 缺少 llm.summary`).toBeTruthy()
       expect(definition.llm.paramGuide, `${actionName} 缺少 llm.paramGuide`).toBeTruthy()
+      expect(definition.llm.whenToUse?.length, `${actionName} 缺少 llm.whenToUse`).toBeGreaterThan(0)
+      expect(definition.llm.whenNotToUse?.length, `${actionName} 缺少 llm.whenNotToUse`).toBeGreaterThan(0)
+      expect(definition.llm.commonMistakes?.length, `${actionName} 缺少 llm.commonMistakes`).toBeGreaterThan(0)
+      expect(definition.llm.stabilityNotes?.length, `${actionName} 缺少 llm.stabilityNotes`).toBeGreaterThan(0)
+      expect(definition.llm.outputMeaning, `${actionName} 缺少 llm.outputMeaning`).toBeTruthy()
+      expect(definition.llm.inputExpectation, `${actionName} 缺少 llm.inputExpectation`).toBeTruthy()
       expect(definition.llm.example?.action, `${actionName} 示例 action 不正确`).toBe(actionName)
 
       const required = definition.paramsSchema.required || []

@@ -41,6 +41,28 @@
           "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。"
         },
         "constraints": [],
+        "whenToUse": [
+          "可以直接用基础体表达主体时优先使用。",
+          "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+        ],
+        "whenNotToUse": [
+          "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+        ],
+        "commonMistakes": [
+          "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "transform.translate",
+          "transform.rotate",
+          "boolean.union",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "solid_box_example",
           "action": "solid.box",
@@ -109,6 +131,28 @@
           "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
         },
         "constraints": [],
+        "whenToUse": [
+          "可以直接用基础体表达主体时优先使用。",
+          "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+        ],
+        "whenNotToUse": [
+          "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+        ],
+        "commonMistakes": [
+          "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "transform.translate",
+          "transform.rotate",
+          "boolean.union",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "solid_roundedBox_example",
           "action": "solid.roundedBox",
@@ -169,6 +213,28 @@
           "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
         },
         "constraints": [],
+        "whenToUse": [
+          "可以直接用基础体表达主体时优先使用。",
+          "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+        ],
+        "whenNotToUse": [
+          "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+        ],
+        "commonMistakes": [
+          "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "transform.translate",
+          "transform.rotate",
+          "boolean.union",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "solid_sphere_example",
           "action": "solid.sphere",
@@ -224,6 +290,28 @@
           "frequency": "integer，整数，或 {\"$var\":\"变量名\"}。 测地球细分频率。 默认值 6。"
         },
         "constraints": [],
+        "whenToUse": [
+          "可以直接用基础体表达主体时优先使用。",
+          "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+        ],
+        "whenNotToUse": [
+          "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+        ],
+        "commonMistakes": [
+          "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "transform.translate",
+          "transform.rotate",
+          "boolean.union",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "solid_geodesicSphere_example",
           "action": "solid.geodesicSphere",
@@ -307,6 +395,28 @@
         "constraints": [
           "必须满足 [height + radius] 或 [height + radiusTop + radiusBottom]。"
         ],
+        "whenToUse": [
+          "可以直接用基础体表达主体时优先使用。",
+          "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+        ],
+        "whenNotToUse": [
+          "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+        ],
+        "commonMistakes": [
+          "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "transform.translate",
+          "transform.rotate",
+          "boolean.union",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "solid_cylinder_example",
           "action": "solid.cylinder",
@@ -374,6 +484,28 @@
           "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
         },
         "constraints": [],
+        "whenToUse": [
+          "可以直接用基础体表达主体时优先使用。",
+          "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+        ],
+        "whenNotToUse": [
+          "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+        ],
+        "commonMistakes": [
+          "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "transform.translate",
+          "transform.rotate",
+          "boolean.union",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "solid_ellipticalCylinder_example",
           "action": "solid.ellipticalCylinder",
@@ -448,6 +580,28 @@
           "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
         },
         "constraints": [],
+        "whenToUse": [
+          "可以直接用基础体表达主体时优先使用。",
+          "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+        ],
+        "whenNotToUse": [
+          "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+        ],
+        "commonMistakes": [
+          "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "transform.translate",
+          "transform.rotate",
+          "boolean.union",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "solid_roundedCylinder_example",
           "action": "solid.roundedCylinder",
@@ -519,6 +673,28 @@
           "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。"
         },
         "constraints": [],
+        "whenToUse": [
+          "可以直接用基础体表达主体时优先使用。",
+          "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+        ],
+        "whenNotToUse": [
+          "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+        ],
+        "commonMistakes": [
+          "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "transform.translate",
+          "transform.rotate",
+          "boolean.union",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "solid_torus_example",
           "action": "solid.torus",
@@ -587,6 +763,28 @@
           "orientation": "enum，可选值：outward / inward。 多面体面朝向。 默认值 \"outward\"。"
         },
         "constraints": [],
+        "whenToUse": [
+          "可以直接用基础体表达主体时优先使用。",
+          "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+        ],
+        "whenNotToUse": [
+          "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+        ],
+        "commonMistakes": [
+          "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "transform.translate",
+          "transform.rotate",
+          "boolean.union",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "solid_polyhedron_example",
           "action": "solid.polyhedron",
@@ -643,6 +841,12 @@
   },
   "llm": {
     "purpose": "三维原语 action 定义。",
-    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+    "actionReadingOrder": [
+      "先看 summary 判断作用。",
+      "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+      "再按 requiredParams 与 paramGuide 填参数。",
+      "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+    ]
   }
 }

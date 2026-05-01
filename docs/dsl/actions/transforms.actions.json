@@ -41,6 +41,28 @@
           "offset": "vector3，长度为 3 的数值数组。 位移向量。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要在不改变几何本质的前提下调整位置、姿态或尺度时使用。"
+        ],
+        "whenNotToUse": [
+          "不要用 transform 代替本应在 primitive/construct 阶段直接表达的尺寸信息。"
+        ],
+        "commonMistakes": [
+          "在阵列和布尔前忘记统一坐标基准，导致对象错位。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "boolean.union",
+          "boolean.subtract",
+          "pattern.linear",
+          "pattern.grid",
+          "pattern.radial"
+        ],
+        "stabilityNotes": [
+          "尽量先得到简单稳定的对象，再做 transform，而不是在草图阶段混入过多偏移。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+        "outputMeaning": "输出类型为 same-as-source，需结合上下文理解后续用法。",
         "example": {
           "id": "transform_translate_example",
           "action": "transform.translate",
@@ -101,6 +123,28 @@
           "origin": "vector3，长度为 3 的数值数组。 阵列起始偏移。 默认值 [0, 0, 0]。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要在不改变几何本质的前提下调整位置、姿态或尺度时使用。"
+        ],
+        "whenNotToUse": [
+          "不要用 transform 代替本应在 primitive/construct 阶段直接表达的尺寸信息。"
+        ],
+        "commonMistakes": [
+          "在阵列和布尔前忘记统一坐标基准，导致对象错位。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "boolean.union",
+          "boolean.subtract",
+          "pattern.linear",
+          "pattern.grid",
+          "pattern.radial"
+        ],
+        "stabilityNotes": [
+          "尽量先得到简单稳定的对象，再做 transform，而不是在草图阶段混入过多偏移。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+        "outputMeaning": "输出类型为 same-as-source，需结合上下文理解后续用法。",
         "example": {
           "id": "transform_rotate_example",
           "action": "transform.rotate",
@@ -166,6 +210,28 @@
           "origin": "vector3，长度为 3 的数值数组。 阵列起始偏移。 默认值 [0, 0, 0]。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要在不改变几何本质的前提下调整位置、姿态或尺度时使用。"
+        ],
+        "whenNotToUse": [
+          "不要用 transform 代替本应在 primitive/construct 阶段直接表达的尺寸信息。"
+        ],
+        "commonMistakes": [
+          "在阵列和布尔前忘记统一坐标基准，导致对象错位。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "boolean.union",
+          "boolean.subtract",
+          "pattern.linear",
+          "pattern.grid",
+          "pattern.radial"
+        ],
+        "stabilityNotes": [
+          "尽量先得到简单稳定的对象，再做 transform，而不是在草图阶段混入过多偏移。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+        "outputMeaning": "输出类型为 same-as-source，需结合上下文理解后续用法。",
         "example": {
           "id": "transform_scale_example",
           "action": "transform.scale",
@@ -222,6 +288,28 @@
           "plane": "plane，对象格式为 { origin, normal }。 平面对象，格式为 { origin, normal }。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要在不改变几何本质的前提下调整位置、姿态或尺度时使用。"
+        ],
+        "whenNotToUse": [
+          "不要用 transform 代替本应在 primitive/construct 阶段直接表达的尺寸信息。"
+        ],
+        "commonMistakes": [
+          "在阵列和布尔前忘记统一坐标基准，导致对象错位。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "boolean.union",
+          "boolean.subtract",
+          "pattern.linear",
+          "pattern.grid",
+          "pattern.radial"
+        ],
+        "stabilityNotes": [
+          "尽量先得到简单稳定的对象，再做 transform，而不是在草图阶段混入过多偏移。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+        "outputMeaning": "输出类型为 same-as-source，需结合上下文理解后续用法。",
         "example": {
           "id": "transform_mirror_example",
           "action": "transform.mirror",
@@ -280,6 +368,28 @@
           "matrix": "matrix4x4，4x4 数值矩阵。 4x4 变换矩阵。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要在不改变几何本质的前提下调整位置、姿态或尺度时使用。"
+        ],
+        "whenNotToUse": [
+          "不要用 transform 代替本应在 primitive/construct 阶段直接表达的尺寸信息。"
+        ],
+        "commonMistakes": [
+          "在阵列和布尔前忘记统一坐标基准，导致对象错位。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "boolean.union",
+          "boolean.subtract",
+          "pattern.linear",
+          "pattern.grid",
+          "pattern.radial"
+        ],
+        "stabilityNotes": [
+          "尽量先得到简单稳定的对象，再做 transform，而不是在草图阶段混入过多偏移。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+        "outputMeaning": "输出类型为 same-as-source，需结合上下文理解后续用法。",
         "example": {
           "id": "transform_matrix_example",
           "action": "transform.matrix",
@@ -318,6 +428,12 @@
   },
   "llm": {
     "purpose": "空间变换类 action 定义。",
-    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+    "actionReadingOrder": [
+      "先看 summary 判断作用。",
+      "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+      "再按 requiredParams 与 paramGuide 填参数。",
+      "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+    ]
   }
 }

@@ -47,6 +47,37 @@
           "twistSteps": "integer，整数，或 {\"$var\":\"变量名\"}。 扭转插值步数。 默认值 1。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。",
+          "板件、法兰、孔槽、轮廓类实体通常优先用它从稳定草图得到实体。"
+        ],
+        "whenNotToUse": [
+          "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+        ],
+        "commonMistakes": [
+          "把 2D 中间态当成最终实体结果。",
+          "对不稳定草图直接拉伸，导致后续布尔复杂度升高。",
+          "source 仍是开路径或无效草图。",
+          "得到 geom3 后又继续按二维心智理解结果。"
+        ],
+        "recommendedBefore": [
+          "sketch.rectangle",
+          "sketch.circle",
+          "sketch.polygon",
+          "sketch.fromCurve"
+        ],
+        "recommendedAfter": [
+          "transform.translate",
+          "boolean.subtract",
+          "display.color",
+          "boolean.union"
+        ],
+        "stabilityNotes": [
+          "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。",
+          "这是从二维草图进入可打印实体的常见稳定路径。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom2。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "construct_extrudeLinear_example",
           "action": "construct.extrudeLinear",
@@ -101,6 +132,32 @@
           "axis": "enum，只能是 x、y、z。 坐标轴，只能是 x / y / z。 默认值 \"z\"。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。"
+        ],
+        "whenNotToUse": [
+          "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+        ],
+        "commonMistakes": [
+          "把 2D 中间态当成最终实体结果。",
+          "对不稳定草图直接拉伸，导致后续布尔复杂度升高。"
+        ],
+        "recommendedBefore": [
+          "sketch.rectangle",
+          "sketch.circle",
+          "sketch.polygon",
+          "sketch.fromCurve"
+        ],
+        "recommendedAfter": [
+          "transform.translate",
+          "boolean.subtract",
+          "display.color"
+        ],
+        "stabilityNotes": [
+          "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom2。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "construct_extrudeRotate_example",
           "action": "construct.extrudeRotate",
@@ -157,6 +214,32 @@
           "caps": "enum，可选值为 none / start / end / both。 路径扫掠两端封口方式。 默认值 \"both\"。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。"
+        ],
+        "whenNotToUse": [
+          "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+        ],
+        "commonMistakes": [
+          "把 2D 中间态当成最终实体结果。",
+          "对不稳定草图直接拉伸，导致后续布尔复杂度升高。"
+        ],
+        "recommendedBefore": [
+          "sketch.rectangle",
+          "sketch.circle",
+          "sketch.polygon",
+          "sketch.fromCurve"
+        ],
+        "recommendedAfter": [
+          "transform.translate",
+          "boolean.subtract",
+          "display.color"
+        ],
+        "stabilityNotes": [
+          "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：curve2。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "construct_extrudeRectangular_example",
           "action": "construct.extrudeRectangular",
@@ -233,6 +316,32 @@
           "close": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 默认值 false。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。"
+        ],
+        "whenNotToUse": [
+          "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+        ],
+        "commonMistakes": [
+          "把 2D 中间态当成最终实体结果。",
+          "对不稳定草图直接拉伸，导致后续布尔复杂度升高。"
+        ],
+        "recommendedBefore": [
+          "sketch.rectangle",
+          "sketch.circle",
+          "sketch.polygon",
+          "sketch.fromCurve"
+        ],
+        "recommendedAfter": [
+          "transform.translate",
+          "boolean.subtract",
+          "display.color"
+        ],
+        "stabilityNotes": [
+          "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom2。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "construct_extrudeFromSlices_example",
           "action": "construct.extrudeFromSlices",
@@ -297,6 +406,32 @@
           "mode": "enum，可选值：orthographic / section。 投影模式。 默认值 \"orthographic\"。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。"
+        ],
+        "whenNotToUse": [
+          "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+        ],
+        "commonMistakes": [
+          "把 2D 中间态当成最终实体结果。",
+          "对不稳定草图直接拉伸，导致后续布尔复杂度升高。"
+        ],
+        "recommendedBefore": [
+          "sketch.rectangle",
+          "sketch.circle",
+          "sketch.polygon",
+          "sketch.fromCurve"
+        ],
+        "recommendedAfter": [
+          "transform.translate",
+          "boolean.subtract",
+          "display.color"
+        ],
+        "stabilityNotes": [
+          "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom3。",
+        "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
         "example": {
           "id": "construct_project_example",
           "action": "construct.project",
@@ -342,6 +477,32 @@
           "plane": "plane，对象格式为 { origin, normal }。 平面对象，格式为 { origin, normal }。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。"
+        ],
+        "whenNotToUse": [
+          "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+        ],
+        "commonMistakes": [
+          "把 2D 中间态当成最终实体结果。",
+          "对不稳定草图直接拉伸，导致后续布尔复杂度升高。"
+        ],
+        "recommendedBefore": [
+          "sketch.rectangle",
+          "sketch.circle",
+          "sketch.polygon",
+          "sketch.fromCurve"
+        ],
+        "recommendedAfter": [
+          "transform.translate",
+          "boolean.subtract",
+          "display.color"
+        ],
+        "stabilityNotes": [
+          "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom3。",
+        "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
         "example": {
           "id": "construct_sectionByPlane_example",
           "action": "construct.sectionByPlane",
@@ -407,6 +568,32 @@
           "keep": "enum，可选值：positive / negative。 裁切时保留平面正侧或负侧。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。"
+        ],
+        "whenNotToUse": [
+          "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+        ],
+        "commonMistakes": [
+          "把 2D 中间态当成最终实体结果。",
+          "对不稳定草图直接拉伸，导致后续布尔复杂度升高。"
+        ],
+        "recommendedBefore": [
+          "sketch.rectangle",
+          "sketch.circle",
+          "sketch.polygon",
+          "sketch.fromCurve"
+        ],
+        "recommendedAfter": [
+          "transform.translate",
+          "boolean.subtract",
+          "display.color"
+        ],
+        "stabilityNotes": [
+          "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom3。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "construct_cutByPlane_example",
           "action": "construct.cutByPlane",
@@ -432,6 +619,12 @@
   },
   "llm": {
     "purpose": "低维到高维、投影与裁切类 action 定义。",
-    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+    "actionReadingOrder": [
+      "先看 summary 判断作用。",
+      "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+      "再按 requiredParams 与 paramGuide 填参数。",
+      "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+    ]
   }
 }

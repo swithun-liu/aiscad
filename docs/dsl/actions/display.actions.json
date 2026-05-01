@@ -39,6 +39,27 @@
           "rgba": "rgba，长度为 4 的颜色数组，范围 0 到 1。 颜色数组，格式为 [r, g, b, a]，范围 0 到 1。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要组织预览结果、上色或输出逻辑分组时使用。"
+        ],
+        "whenNotToUse": [
+          "不要把 display 当成生成几何的步骤。"
+        ],
+        "commonMistakes": [
+          "把 display.group 误以为会执行几何并集。",
+          "把 display.color 当成会改变几何尺寸或实体结构。"
+        ],
+        "recommendedBefore": [
+          "boolean.union",
+          "boolean.subtract",
+          "construct.extrudeLinear"
+        ],
+        "recommendedAfter": [],
+        "stabilityNotes": [
+          "display 应放在建模链路末尾，保持与几何生成解耦。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
+        "outputMeaning": "输出类型为 same-as-source，需结合上下文理解后续用法。",
         "example": {
           "id": "display_color_example",
           "action": "display.color",
@@ -85,6 +106,27 @@
           "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要组织预览结果、上色或输出逻辑分组时使用。"
+        ],
+        "whenNotToUse": [
+          "不要把 display 当成生成几何的步骤。"
+        ],
+        "commonMistakes": [
+          "把 display.group 误以为会执行几何并集。",
+          "把 display.color 当成会改变几何尺寸或实体结构。"
+        ],
+        "recommendedBefore": [
+          "boolean.union",
+          "boolean.subtract",
+          "construct.extrudeLinear"
+        ],
+        "recommendedAfter": [],
+        "stabilityNotes": [
+          "display 应放在建模链路末尾，保持与几何生成解耦。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+        "outputMeaning": "逻辑输出组，用于一起预览、导出或表达多个结果，并不会执行几何并集。",
         "example": {
           "id": "display_group_example",
           "action": "display.group",
@@ -100,6 +142,12 @@
   },
   "llm": {
     "purpose": "显示与逻辑分组类 action 定义。",
-    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+    "actionReadingOrder": [
+      "先看 summary 判断作用。",
+      "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+      "再按 requiredParams 与 paramGuide 填参数。",
+      "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+    ]
   }
 }

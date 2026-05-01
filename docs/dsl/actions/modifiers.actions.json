@@ -46,6 +46,26 @@
           "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
+        ],
+        "whenNotToUse": [
+          "不要用 modify 去掩盖前序草图或实体建模策略错误。"
+        ],
+        "commonMistakes": [
+          "把 offset/expand 的结果当作严格尺寸控制而忽略边角变化。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "construct.extrudeLinear",
+          "boolean.subtract",
+          "display.color"
+        ],
+        "stabilityNotes": [
+          "modify 更适合作为精修或派生步骤，而不是主建模骨架。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom2。",
+        "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
         "example": {
           "id": "modify_offset2d_example",
           "action": "modify.offset2d",
@@ -101,6 +121,26 @@
           "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
+        ],
+        "whenNotToUse": [
+          "不要用 modify 去掩盖前序草图或实体建模策略错误。"
+        ],
+        "commonMistakes": [
+          "把 offset/expand 的结果当作严格尺寸控制而忽略边角变化。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "construct.extrudeLinear",
+          "boolean.subtract",
+          "display.color"
+        ],
+        "stabilityNotes": [
+          "modify 更适合作为精修或派生步骤，而不是主建模骨架。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom2。",
+        "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
         "example": {
           "id": "modify_expand2d_example",
           "action": "modify.expand2d",
@@ -156,6 +196,26 @@
           "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
+        ],
+        "whenNotToUse": [
+          "不要用 modify 去掩盖前序草图或实体建模策略错误。"
+        ],
+        "commonMistakes": [
+          "把 offset/expand 的结果当作严格尺寸控制而忽略边角变化。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "construct.extrudeLinear",
+          "boolean.subtract",
+          "display.color"
+        ],
+        "stabilityNotes": [
+          "modify 更适合作为精修或派生步骤，而不是主建模骨架。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom3。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
         "example": {
           "id": "modify_expand3d_example",
           "action": "modify.expand3d",
@@ -198,6 +258,26 @@
           "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
+        ],
+        "whenNotToUse": [
+          "不要用 modify 去掩盖前序草图或实体建模策略错误。"
+        ],
+        "commonMistakes": [
+          "把 offset/expand 的结果当作严格尺寸控制而忽略边角变化。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "construct.extrudeLinear",
+          "boolean.subtract",
+          "display.color"
+        ],
+        "stabilityNotes": [
+          "modify 更适合作为精修或派生步骤，而不是主建模骨架。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
+        "outputMeaning": "输出类型为 same-dimension，需结合上下文理解后续用法。",
         "example": {
           "id": "modify_hull_example",
           "action": "modify.hull",
@@ -240,6 +320,26 @@
           "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
+        ],
+        "whenNotToUse": [
+          "不要用 modify 去掩盖前序草图或实体建模策略错误。"
+        ],
+        "commonMistakes": [
+          "把 offset/expand 的结果当作严格尺寸控制而忽略边角变化。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "construct.extrudeLinear",
+          "boolean.subtract",
+          "display.color"
+        ],
+        "stabilityNotes": [
+          "modify 更适合作为精修或派生步骤，而不是主建模骨架。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
+        "outputMeaning": "输出类型为 same-dimension，需结合上下文理解后续用法。",
         "example": {
           "id": "modify_hullChain_example",
           "action": "modify.hullChain",
@@ -297,6 +397,26 @@
           "triangulate": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否三角化输出网格。 默认值 false。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
+        ],
+        "whenNotToUse": [
+          "不要用 modify 去掩盖前序草图或实体建模策略错误。"
+        ],
+        "commonMistakes": [
+          "把 offset/expand 的结果当作严格尺寸控制而忽略边角变化。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "construct.extrudeLinear",
+          "boolean.subtract",
+          "display.color"
+        ],
+        "stabilityNotes": [
+          "modify 更适合作为精修或派生步骤，而不是主建模骨架。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3。",
+        "outputMeaning": "输出类型为 same-as-source，需结合上下文理解后续用法。",
         "example": {
           "id": "modify_generalize_example",
           "action": "modify.generalize",
@@ -312,6 +432,12 @@
   },
   "llm": {
     "purpose": "偏移、扩张、凸包、清理类 action 定义。",
-    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+    "actionReadingOrder": [
+      "先看 summary 判断作用。",
+      "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+      "再按 requiredParams 与 paramGuide 填参数。",
+      "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+    ]
   }
 }

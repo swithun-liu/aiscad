@@ -1,4 +1,5 @@
 import { actionDefinitions, actionSets, commonTypesSchema, programSchema } from './definitions.js'
+import { GLOBAL_DSL_GENERATION_RULES } from './strategy.js'
 
 export const SUPPORTED_ACTION_NAMES = Object.entries(actionDefinitions)
   .filter(([, definition]) => definition.llm?.webSupported !== false)
@@ -28,8 +29,12 @@ export function buildDslPrompt(description) {
 8. 参数尽量使用显式数值，不要使用 variables，除非明显有复用价值。
 9. 尽量采用稳定的建模策略：先 2D 草图，再拉伸；或直接 primitive + transform + boolean。
 10. 看到 paramsSchema 时必须严格按 required / properties / oneOf / default 填写参数。
-11. 看到 llm 时优先参考 llm.summary、llm.paramGuide、llm.constraints、llm.example。
+11. 看到 llm 时优先参考 llm.summary、llm.whenToUse、llm.whenNotToUse、llm.commonMistakes、llm.recommendedAfter、llm.stabilityNotes、llm.paramGuide、llm.constraints、llm.example。
 12. 如果某个 action 的 llm.webSupported = false，则禁止使用。
+13. 除了单个 action 的局部说明，还必须遵守下面的全局生成规则 JSON。
+
+全局生成规则：
+${JSON.stringify(GLOBAL_DSL_GENERATION_RULES, null, 2)}
 
 下面是可以直接阅读并遵守的 DSL 定义 JSON：
 ${JSON.stringify(AI_READABLE_DSL_REFERENCE, null, 2)}

@@ -44,6 +44,28 @@
           "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要生成二维截面、轮廓或拉伸前草图时使用。",
+          "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+        ],
+        "whenNotToUse": [
+          "不要把 geom2 当成已经具有厚度的实体理解。"
+        ],
+        "commonMistakes": [
+          "草图还未封闭就直接进入实体构造。",
+          "把过多细节堆在单个草图里，导致后续布尔难维护。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "construct.extrudeLinear",
+          "modify.offset2d",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
         "example": {
           "id": "sketch_circle_example",
           "action": "sketch.circle",
@@ -96,6 +118,28 @@
           "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要生成二维截面、轮廓或拉伸前草图时使用。",
+          "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+        ],
+        "whenNotToUse": [
+          "不要把 geom2 当成已经具有厚度的实体理解。"
+        ],
+        "commonMistakes": [
+          "草图还未封闭就直接进入实体构造。",
+          "把过多细节堆在单个草图里，导致后续布尔难维护。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "construct.extrudeLinear",
+          "modify.offset2d",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
         "example": {
           "id": "sketch_ellipse_example",
           "action": "sketch.ellipse",
@@ -147,6 +191,28 @@
           "center": "vector2，长度为 2 的数值数组。 中心点坐标。 默认值 [0, 0]。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要生成二维截面、轮廓或拉伸前草图时使用。",
+          "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+        ],
+        "whenNotToUse": [
+          "不要把 geom2 当成已经具有厚度的实体理解。"
+        ],
+        "commonMistakes": [
+          "草图还未封闭就直接进入实体构造。",
+          "把过多细节堆在单个草图里，导致后续布尔难维护。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "construct.extrudeLinear",
+          "modify.offset2d",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
         "example": {
           "id": "sketch_rectangle_example",
           "action": "sketch.rectangle",
@@ -212,6 +278,28 @@
           "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要生成二维截面、轮廓或拉伸前草图时使用。",
+          "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+        ],
+        "whenNotToUse": [
+          "不要把 geom2 当成已经具有厚度的实体理解。"
+        ],
+        "commonMistakes": [
+          "草图还未封闭就直接进入实体构造。",
+          "把过多细节堆在单个草图里，导致后续布尔难维护。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "construct.extrudeLinear",
+          "modify.offset2d",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
         "example": {
           "id": "sketch_roundedRectangle_example",
           "action": "sketch.roundedRectangle",
@@ -257,6 +345,28 @@
           "points": "point2[]，二维点数组。 点列表，按顺序定义轮廓或路径。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要生成二维截面、轮廓或拉伸前草图时使用。",
+          "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+        ],
+        "whenNotToUse": [
+          "不要把 geom2 当成已经具有厚度的实体理解。"
+        ],
+        "commonMistakes": [
+          "草图还未封闭就直接进入实体构造。",
+          "把过多细节堆在单个草图里，导致后续布尔难维护。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "construct.extrudeLinear",
+          "modify.offset2d",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
         "example": {
           "id": "sketch_polygon_example",
           "action": "sketch.polygon",
@@ -311,6 +421,28 @@
           "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要生成二维截面、轮廓或拉伸前草图时使用。",
+          "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+        ],
+        "whenNotToUse": [
+          "不要把 geom2 当成已经具有厚度的实体理解。"
+        ],
+        "commonMistakes": [
+          "草图还未封闭就直接进入实体构造。",
+          "把过多细节堆在单个草图里，导致后续布尔难维护。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "construct.extrudeLinear",
+          "modify.offset2d",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：curve2。",
+        "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
         "example": {
           "id": "sketch_fromCurve_example",
           "action": "sketch.fromCurve",
@@ -378,6 +510,28 @@
           "position": "vector2，长度为 2 的数值数组。 文本位置。 默认值 [0, 0]。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要生成二维截面、轮廓或拉伸前草图时使用。",
+          "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+        ],
+        "whenNotToUse": [
+          "不要把 geom2 当成已经具有厚度的实体理解。"
+        ],
+        "commonMistakes": [
+          "草图还未封闭就直接进入实体构造。",
+          "把过多细节堆在单个草图里，导致后续布尔难维护。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "construct.extrudeLinear",
+          "modify.offset2d",
+          "boolean.subtract"
+        ],
+        "stabilityNotes": [
+          "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
         "example": {
           "id": "sketch_text_example",
           "action": "sketch.text",
@@ -396,6 +550,12 @@
   },
   "llm": {
     "purpose": "二维封闭草图 action 定义。",
-    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+    "actionReadingOrder": [
+      "先看 summary 判断作用。",
+      "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+      "再按 requiredParams 与 paramGuide 填参数。",
+      "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+    ]
   }
 }

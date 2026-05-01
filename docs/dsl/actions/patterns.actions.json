@@ -55,6 +55,32 @@
           "origin": "vector3，长度为 3 的数值数组。 阵列起始偏移。 默认值 [0, 0, 0]。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要重复特征、阵列孔位、均匀分布单元时使用。"
+        ],
+        "whenNotToUse": [
+          "不要为了表达少量重复而引入超大阵列。",
+          "不要默认阵列结果天然已经限制在目标边界内。"
+        ],
+        "commonMistakes": [
+          "count、step、origin 配合错误导致阵列超范围。",
+          "把阵列 group 直接拿去做大规模布尔而没有控制作用区域。"
+        ],
+        "recommendedBefore": [
+          "solid.cylinder",
+          "sketch.circle",
+          "transform.translate"
+        ],
+        "recommendedAfter": [
+          "boolean.subtract",
+          "display.group",
+          "transform.translate"
+        ],
+        "stabilityNotes": [
+          "阵列越大，后续布尔越要谨慎；必要时先限制区域，再参与实体运算。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+        "outputMeaning": "输出是逻辑分组，内部保留多个对象，后续需区分 group 与单体对象。",
         "example": {
           "id": "pattern_linear_example",
           "action": "pattern.linear",
@@ -132,6 +158,35 @@
           "origin": "vector3，长度为 3 的数值数组。 阵列起始偏移。 默认值 [0, 0, 0]。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要重复特征、阵列孔位、均匀分布单元时使用。"
+        ],
+        "whenNotToUse": [
+          "不要为了表达少量重复而引入超大阵列。",
+          "不要默认阵列结果天然已经限制在目标边界内。"
+        ],
+        "commonMistakes": [
+          "count、step、origin 配合错误导致阵列超范围。",
+          "把阵列 group 直接拿去做大规模布尔而没有控制作用区域。",
+          "count 很大但没有评估后续布尔复杂度。",
+          "把 origin 当成中心点而不是首个实例的偏移。"
+        ],
+        "recommendedBefore": [
+          "solid.cylinder",
+          "sketch.circle",
+          "transform.translate"
+        ],
+        "recommendedAfter": [
+          "boolean.subtract",
+          "display.group",
+          "transform.translate"
+        ],
+        "stabilityNotes": [
+          "阵列越大，后续布尔越要谨慎；必要时先限制区域，再参与实体运算。",
+          "大阵列更适合作为中间特征集合，不要默认它已经适配外轮廓边界。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+        "outputMeaning": "输出是逻辑分组，内部保留多个对象，后续需区分 group 与单体对象。",
         "example": {
           "id": "pattern_grid_example",
           "action": "pattern.grid",
@@ -228,6 +283,32 @@
           "rotateItems": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 阵列后是否同步旋转每个复制体。 默认值 true。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要重复特征、阵列孔位、均匀分布单元时使用。"
+        ],
+        "whenNotToUse": [
+          "不要为了表达少量重复而引入超大阵列。",
+          "不要默认阵列结果天然已经限制在目标边界内。"
+        ],
+        "commonMistakes": [
+          "count、step、origin 配合错误导致阵列超范围。",
+          "把阵列 group 直接拿去做大规模布尔而没有控制作用区域。"
+        ],
+        "recommendedBefore": [
+          "solid.cylinder",
+          "sketch.circle",
+          "transform.translate"
+        ],
+        "recommendedAfter": [
+          "boolean.subtract",
+          "display.group",
+          "transform.translate"
+        ],
+        "stabilityNotes": [
+          "阵列越大，后续布尔越要谨慎；必要时先限制区域，再参与实体运算。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+        "outputMeaning": "输出是逻辑分组，内部保留多个对象，后续需区分 group 与单体对象。",
         "example": {
           "id": "pattern_radial_example",
           "action": "pattern.radial",
@@ -251,6 +332,12 @@
   },
   "llm": {
     "purpose": "阵列复制类 action 定义。",
-    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+    "actionReadingOrder": [
+      "先看 summary 判断作用。",
+      "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+      "再按 requiredParams 与 paramGuide 填参数。",
+      "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+    ]
   }
 }

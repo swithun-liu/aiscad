@@ -41,7 +41,7 @@
         "properties": {
           "eps": {
             "type": "number",
-            "minimum": 1e-06
+            "minimum": 0.000001
           },
           "segments": {
             "type": "integer",

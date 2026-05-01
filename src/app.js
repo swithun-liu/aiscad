@@ -92,6 +92,20 @@ function setError(root, message = '') {
   box.hidden = !message
 }
 
+function setWarnings(root, warnings = []) {
+  const box = el('[data-role="warnings"]', root)
+  if (!warnings.length) {
+    box.textContent = ''
+    box.hidden = true
+    return
+  }
+
+  box.textContent = warnings
+    .map((warning, index) => `${index + 1}. ${warning.message}`)
+    .join('\n')
+  box.hidden = false
+}
+
 function persistField(key, value) {
   localStorage.setItem(key, value)
 }
@@ -243,8 +257,12 @@ async function renderProgram(root, viewer, source, appState, options = {}) {
   viewer.render(result.renderables, {
     exportRecords: result.renderables,
   })
-  setStatus(root, `渲染成功，共执行 ${source.actions.length} 条 action。`, 'success')
+  const warningCount = result.strategyWarnings?.length || 0
+  setStatus(root, warningCount
+    ? `渲染成功，共执行 ${source.actions.length} 条 action；发现 ${warningCount} 条策略提醒。`
+    : `渲染成功，共执行 ${source.actions.length} 条 action。`, warningCount ? 'loading' : 'success')
   setError(root)
+  setWarnings(root, result.strategyWarnings)
   setActionFocusUi(root, null)
   if (options.syncFocus !== false) {
     syncEditorFocus(root, viewer, options.jsonEditor, appState)
@@ -252,7 +270,7 @@ async function renderProgram(root, viewer, source, appState, options = {}) {
   return result
 }
 
-function loadProgramIntoEditor(root, descriptionInput, jsonEditor, testCase) {
+function loadProgramIntoEditor(descriptionInput, jsonEditor, testCase) {
   descriptionInput.value = testCase.description
   persistField(STORAGE_KEYS.description, descriptionInput.value)
   jsonEditor.setValue(formatJson(testCase.program))
@@ -306,6 +324,7 @@ export function createApp(root, dependencies = {}) {
 
         <div class="status" data-role="status">等待输入</div>
         <pre class="error" data-role="error" hidden></pre>
+        <pre class="warning-list" data-role="warnings" hidden></pre>
 
         <details class="card nested-card">
           <summary>当前支持的 action</summary>
@@ -391,9 +410,11 @@ export function createApp(root, dependencies = {}) {
       }
       await copy(buildPrompt(description))
       setError(root)
+      setWarnings(root)
       setStatus(root, '完整 Prompt 已复制，可直接发给任意 chat AI 生成 DSL JSON。', 'success')
     } catch (error) {
       setError(root, error instanceof Error ? error.message : String(error))
+      setWarnings(root)
       setStatus(root, '复制 Prompt 失败', 'error')
     }
   })
@@ -413,7 +434,7 @@ export function createApp(root, dependencies = {}) {
       const activeCase = getVisualTestCase(visualLabState.activeCaseId) || VISUAL_TEST_CASES[0]
       const activeResult = visualLabState.results.find((item) => item.caseId === activeCase?.id)
       if (activeCase && activeResult?.compiled) {
-        loadProgramIntoEditor(root, descriptionInput, jsonEditor, activeCase)
+        loadProgramIntoEditor(descriptionInput, jsonEditor, activeCase)
         appState.compiled = activeResult.compiled
         viewer.render(activeResult.compiled.renderables, {
           exportRecords: activeResult.compiled.renderables,
@@ -425,6 +446,7 @@ export function createApp(root, dependencies = {}) {
       setStatus(root, failedCount === 0 ? '测试案例全部通过，可直接点击单个案例肉眼检查效果。' : `测试案例运行完成，失败 ${failedCount} 个。`, failedCount === 0 ? 'success' : 'error')
     } catch (error) {
       setError(root, error instanceof Error ? error.message : String(error))
+      setWarnings(root)
       setStatus(root, '运行测试案例失败', 'error')
     }
   })
@@ -439,7 +461,7 @@ export function createApp(root, dependencies = {}) {
     visualLabState.activeCaseId = testCase.id
 
     if (button.dataset.action === 'load-case') {
-      loadProgramIntoEditor(root, descriptionInput, jsonEditor, testCase)
+      loadProgramIntoEditor(descriptionInput, jsonEditor, testCase)
       renderVisualLab(root, visualLabState)
       setError(root)
       setStatus(root, `已载入测试案例“${testCase.name}”到 JSON 编辑器。`, 'success')
@@ -452,7 +474,7 @@ export function createApp(root, dependencies = {}) {
         ...visualLabState.results.filter((item) => item.caseId !== testCase.id),
         result,
       ]
-      loadProgramIntoEditor(root, descriptionInput, jsonEditor, testCase)
+      loadProgramIntoEditor(descriptionInput, jsonEditor, testCase)
       appState.compiled = result.compiled
       viewer.render(result.compiled.renderables, {
         exportRecords: result.compiled.renderables,
@@ -460,6 +482,7 @@ export function createApp(root, dependencies = {}) {
       syncEditorFocus(root, viewer, jsonEditor, appState)
       renderVisualLab(root, visualLabState)
       setError(root)
+      setWarnings(root, result.compiled?.strategyWarnings || [])
       setStatus(root, `已预览测试案例“${testCase.name}”，你可以直接肉眼检查模型效果。`, result.passed ? 'success' : 'error')
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
@@ -477,6 +500,7 @@ export function createApp(root, dependencies = {}) {
       ]
       renderVisualLab(root, visualLabState)
       setError(root, message)
+      setWarnings(root)
       setStatus(root, `测试案例“${testCase.name}”运行失败`, 'error')
     }
   })
@@ -485,9 +509,11 @@ export function createApp(root, dependencies = {}) {
     try {
       viewer.exportStl(buildStlFileName(descriptionInput.value))
       setError(root)
+      setWarnings(root, appState.compiled?.strategyWarnings || [])
       setStatus(root, 'STL 已开始导出。', 'success')
     } catch (error) {
       setError(root, error instanceof Error ? error.message : String(error))
+      setWarnings(root)
       setStatus(root, '导出 STL 失败', 'error')
     }
   })
@@ -498,6 +524,7 @@ export function createApp(root, dependencies = {}) {
       await renderProgram(root, viewer, parsed, appState, { jsonEditor })
     } catch (error) {
       setError(root, error instanceof Error ? error.message : String(error))
+      setWarnings(root)
       setStatus(root, '渲染失败', 'error')
     }
   })
@@ -517,6 +544,7 @@ export function createApp(root, dependencies = {}) {
       await renderProgram(root, viewer, program, appState, { jsonEditor })
     } catch (error) {
       setError(root, error instanceof Error ? error.message : String(error))
+      setWarnings(root)
       setStatus(root, '生成失败', 'error')
     } finally {
       toggleBusy(root, false)
@@ -525,6 +553,7 @@ export function createApp(root, dependencies = {}) {
 
   renderProgram(root, viewer, EXAMPLE_PROGRAM, appState, { jsonEditor }).catch((error) => {
     setError(root, error instanceof Error ? error.message : String(error))
+    setWarnings(root)
     setStatus(root, '初始化失败', 'error')
   })
 

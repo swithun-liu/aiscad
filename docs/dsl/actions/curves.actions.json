@@ -37,6 +37,28 @@
           "closed": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否闭合路径或扫掠轨迹。 默认值 false。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要先描述二维路径，再决定是否闭合成草图时使用。",
+          "当后续会拼接路径、闭合轮廓或沿路径扫掠时使用。"
+        ],
+        "whenNotToUse": [
+          "不要把 curve2 直接当成最终可打印实体输出。"
+        ],
+        "commonMistakes": [
+          "路径点顺序混乱，导致轮廓方向或闭合关系异常。",
+          "把开路径误当成可直接拉伸的封闭草图。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "curve.close",
+          "sketch.fromCurve",
+          "construct.extrudeRectangular"
+        ],
+        "stabilityNotes": [
+          "复杂实体优先先得到稳定的二维轮廓，再进入 sketch 或 construct 阶段。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是二维路径，不具备面积与厚度，通常用于闭合、扫掠或转成草图。",
         "example": {
           "id": "curve_line_example",
           "action": "curve.line",
@@ -112,6 +134,28 @@
           "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要先描述二维路径，再决定是否闭合成草图时使用。",
+          "当后续会拼接路径、闭合轮廓或沿路径扫掠时使用。"
+        ],
+        "whenNotToUse": [
+          "不要把 curve2 直接当成最终可打印实体输出。"
+        ],
+        "commonMistakes": [
+          "路径点顺序混乱，导致轮廓方向或闭合关系异常。",
+          "把开路径误当成可直接拉伸的封闭草图。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "curve.close",
+          "sketch.fromCurve",
+          "construct.extrudeRectangular"
+        ],
+        "stabilityNotes": [
+          "复杂实体优先先得到稳定的二维轮廓，再进入 sketch 或 construct 阶段。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是二维路径，不具备面积与厚度，通常用于闭合、扫掠或转成草图。",
         "example": {
           "id": "curve_arc_example",
           "action": "curve.arc",
@@ -158,6 +202,28 @@
           "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要先描述二维路径，再决定是否闭合成草图时使用。",
+          "当后续会拼接路径、闭合轮廓或沿路径扫掠时使用。"
+        ],
+        "whenNotToUse": [
+          "不要把 curve2 直接当成最终可打印实体输出。"
+        ],
+        "commonMistakes": [
+          "路径点顺序混乱，导致轮廓方向或闭合关系异常。",
+          "把开路径误当成可直接拉伸的封闭草图。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "curve.close",
+          "sketch.fromCurve",
+          "construct.extrudeRectangular"
+        ],
+        "stabilityNotes": [
+          "复杂实体优先先得到稳定的二维轮廓，再进入 sketch 或 construct 阶段。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是二维路径，不具备面积与厚度，通常用于闭合、扫掠或转成草图。",
         "example": {
           "id": "curve_bezier_example",
           "action": "curve.bezier",
@@ -214,6 +280,28 @@
           "closed": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否闭合路径或扫掠轨迹。 默认值 false。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要先描述二维路径，再决定是否闭合成草图时使用。",
+          "当后续会拼接路径、闭合轮廓或沿路径扫掠时使用。"
+        ],
+        "whenNotToUse": [
+          "不要把 curve2 直接当成最终可打印实体输出。"
+        ],
+        "commonMistakes": [
+          "路径点顺序混乱，导致轮廓方向或闭合关系异常。",
+          "把开路径误当成可直接拉伸的封闭草图。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "curve.close",
+          "sketch.fromCurve",
+          "construct.extrudeRectangular"
+        ],
+        "stabilityNotes": [
+          "复杂实体优先先得到稳定的二维轮廓，再进入 sketch 或 construct 阶段。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：curve2。",
+        "outputMeaning": "输出是二维路径，不具备面积与厚度，通常用于闭合、扫掠或转成草图。",
         "example": {
           "id": "curve_concat_example",
           "action": "curve.concat",
@@ -255,6 +343,28 @@
           "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。"
         },
         "constraints": [],
+        "whenToUse": [
+          "需要先描述二维路径，再决定是否闭合成草图时使用。",
+          "当后续会拼接路径、闭合轮廓或沿路径扫掠时使用。"
+        ],
+        "whenNotToUse": [
+          "不要把 curve2 直接当成最终可打印实体输出。"
+        ],
+        "commonMistakes": [
+          "路径点顺序混乱，导致轮廓方向或闭合关系异常。",
+          "把开路径误当成可直接拉伸的封闭草图。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "curve.close",
+          "sketch.fromCurve",
+          "construct.extrudeRectangular"
+        ],
+        "stabilityNotes": [
+          "复杂实体优先先得到稳定的二维轮廓，再进入 sketch 或 construct 阶段。"
+        ],
+        "inputExpectation": "输入通常来自这些类型之一：curve2。",
+        "outputMeaning": "输出是二维路径，不具备面积与厚度，通常用于闭合、扫掠或转成草图。",
         "example": {
           "id": "curve_close_example",
           "action": "curve.close",
@@ -267,6 +377,12 @@
   },
   "llm": {
     "purpose": "二维路径与曲线 action 定义。",
-    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。"
+    "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+    "actionReadingOrder": [
+      "先看 summary 判断作用。",
+      "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+      "再按 requiredParams 与 paramGuide 填参数。",
+      "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+    ]
   }
 }

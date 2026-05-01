@@ -24,6 +24,7 @@ describe('validateAndCompileProgram', () => {
     expect(bbox[1][2]).toBeCloseTo(5, 5)
     expect(volume).toBeGreaterThan(94800)
     expect(volume).toBeLessThan(94950)
+    expect(result.strategyWarnings).toEqual([])
   })
 
   test('rejects invalid params early with schema errors', () => {
@@ -40,5 +41,79 @@ describe('validateAndCompileProgram', () => {
 
     expect(() => validateAndCompileProgram(invalidProgram))
       .toThrow(/未定义/)
+  })
+
+  test('returns strategy warnings when final result is still 2d', () => {
+    const program = {
+      dsl: 'aiscad.dsl',
+      version: '1.0.0',
+      units: 'mm',
+      actions: [
+        {
+          id: 'profile',
+          action: 'sketch.rectangle',
+          params: {
+            size: [80, 40],
+            center: [0, 0],
+          },
+        },
+      ],
+      result: 'profile',
+    }
+
+    const result = validateAndCompileProgram(program)
+
+    expect(result.strategyWarnings.some((item) => item.code === 'final-result-not-3d')).toBe(true)
+  })
+
+  test('returns strategy warnings for high-complexity pattern subtraction', () => {
+    const program = {
+      dsl: 'aiscad.dsl',
+      version: '1.0.0',
+      units: 'mm',
+      actions: [
+        {
+          id: 'plate',
+          action: 'solid.box',
+          params: {
+            size: [200, 120, 8],
+            center: [0, 0, 0],
+          },
+        },
+        {
+          id: 'tool',
+          action: 'solid.cylinder',
+          params: {
+            height: 12,
+            radius: 2,
+            center: [0, 0, 0],
+          },
+        },
+        {
+          id: 'tool_grid',
+          action: 'pattern.grid',
+          params: {
+            source: 'tool',
+            count: [9, 8, 1],
+            step: [18, 14, 0],
+            origin: [-72, -49, 0],
+          },
+        },
+        {
+          id: 'body',
+          action: 'boolean.subtract',
+          params: {
+            base: 'plate',
+            tools: ['tool_grid'],
+          },
+        },
+      ],
+      result: 'body',
+    }
+
+    const result = validateAndCompileProgram(program)
+
+    expect(result.strategyWarnings.some((item) => item.code === 'large-pattern-instance-count')).toBe(true)
+    expect(result.strategyWarnings.some((item) => item.code === 'pattern-group-used-as-subtract-tools')).toBe(true)
   })
 })
