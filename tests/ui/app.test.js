@@ -12,6 +12,21 @@ describe('createApp', () => {
   beforeEach(() => {
     document.body.innerHTML = '<div id="app"></div>'
     localStorage.clear()
+    if (!Range.prototype.getClientRects) {
+      Range.prototype.getClientRects = () => []
+    }
+    if (!Range.prototype.getBoundingClientRect) {
+      Range.prototype.getBoundingClientRect = () => ({
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+      })
+    }
   })
 
   test('renders the example program on startup and allows exporting STL', async () => {
@@ -72,7 +87,7 @@ describe('createApp', () => {
     expect(generateDslWithDeepSeek).toHaveBeenCalledTimes(1)
     expect(render).toHaveBeenCalled()
 
-    const editorValue = document.querySelector('[data-role="json-editor"]').value
+    const editorValue = document.querySelector('[data-role="json-editor"]').__jsonEditor.getValue()
     expect(editorValue).toContain('"size": [')
     expect(editorValue).toContain('200')
   })
@@ -87,13 +102,24 @@ describe('createApp', () => {
     await flushPromises()
 
     const editor = document.querySelector('[data-role="json-editor"]')
-    const subtractOffset = editor.value.indexOf('"action": "boolean.subtract"')
-    editor.focus()
-    editor.setSelectionRange(subtractOffset, subtractOffset)
-    editor.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'ArrowDown' }))
+    const editorApi = editor.__jsonEditor
+    const subtractOffset = editorApi.getValue().indexOf('"action": "boolean.subtract"')
+    editorApi.setCursorOffset(subtractOffset)
 
     expect(document.querySelector('[data-role="action-focus"]').textContent).toContain('body / boolean.subtract')
     expect(document.querySelector('[data-role="viewer-focus-mode"]').textContent).toContain('base + tools + result')
     expect(render).toHaveBeenCalled()
+  })
+
+  test('renders CodeMirror editor with syntax highlighting and gutters', async () => {
+    createApp(document.querySelector('#app'), {
+      createViewer: () => ({ render: vi.fn(), exportStl: vi.fn() }),
+    })
+
+    await flushPromises()
+
+    expect(document.querySelector('[data-role="json-editor"]')).toBeTruthy()
+    expect(document.querySelector('.cm-gutters')).toBeTruthy()
+    expect(document.querySelector('.cm-content').textContent).toContain('"dsl": "aiscad.dsl"')
   })
 })

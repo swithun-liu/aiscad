@@ -2,6 +2,7 @@ import { generateDslWithDeepSeek } from './lib/deepseek.js'
 import { actionDefinitions } from './lib/dsl/definitions.js'
 import { buildActionFocusView, getActionIdAtCursor } from './lib/dsl/action-focus.js'
 import { validateAndCompileProgram } from './lib/dsl/compiler.js'
+import { createJsonEditor } from './lib/editor/json-editor.js'
 import { buildDslPrompt, SUPPORTED_ACTION_NAMES } from './lib/dsl/prompt.js'
 import { ThreeCadViewer } from './lib/renderer/three-viewer.js'
 import { VISUAL_TEST_CASES, getVisualTestCase } from './lib/testing/cases.js'
@@ -218,7 +219,7 @@ function syncEditorFocus(root, viewer, jsonEditor, appState) {
     return
   }
 
-  const actionId = getActionIdAtCursor(jsonEditor.value, jsonEditor.selectionStart || 0)
+  const actionId = getActionIdAtCursor(jsonEditor.getValue(), jsonEditor.getCursorOffset())
   const focusView = buildActionFocusView(appState.compiled, actionId)
   appState.focusedActionId = focusView?.actionId || null
   setActionFocusUi(root, focusView)
@@ -254,7 +255,7 @@ async function renderProgram(root, viewer, source, appState, options = {}) {
 function loadProgramIntoEditor(root, descriptionInput, jsonEditor, testCase) {
   descriptionInput.value = testCase.description
   persistField(STORAGE_KEYS.description, descriptionInput.value)
-  jsonEditor.value = formatJson(testCase.program)
+  jsonEditor.setValue(formatJson(testCase.program))
 }
 
 export function createApp(root, dependencies = {}) {
@@ -318,7 +319,7 @@ export function createApp(root, dependencies = {}) {
             <h2>DSL JSON</h2>
             <span class="muted">可直接手动修改后重新渲染</span>
           </div>
-          <textarea data-role="json-editor" class="json-editor" spellcheck="false"></textarea>
+          <div data-role="json-editor-host" class="json-editor-shell"></div>
           <div class="action-focus-hint muted" data-role="action-focus">当前 action: 未聚焦，右侧显示完整模型。</div>
         </section>
 
@@ -352,7 +353,6 @@ export function createApp(root, dependencies = {}) {
   const apiKeyInput = el('[data-role="api-key"]', root)
   const modelInput = el('[data-role="model"]', root)
   const descriptionInput = el('[data-role="description"]', root)
-  const jsonEditor = el('[data-role="json-editor"]', root)
   const viewer = createViewer(el('[data-role="viewer"]', root))
   const visualLabState = {
     activeCaseId: VISUAL_TEST_CASES[0]?.id || null,
@@ -362,11 +362,16 @@ export function createApp(root, dependencies = {}) {
     compiled: null,
     focusedActionId: null,
   }
+  let jsonEditor
+  jsonEditor = createJsonEditor(el('[data-role="json-editor-host"]', root), {
+    value: formatJson(EXAMPLE_PROGRAM),
+    onChange: () => syncEditorFocus(root, viewer, jsonEditor, appState),
+    onSelectionChange: () => syncEditorFocus(root, viewer, jsonEditor, appState),
+  })
 
   apiKeyInput.value = readField(STORAGE_KEYS.apiKey)
   modelInput.value = readField(STORAGE_KEYS.model, 'deepseek-chat')
   descriptionInput.value = readField(STORAGE_KEYS.description, EXAMPLE_DESCRIPTION)
-  jsonEditor.value = formatJson(EXAMPLE_PROGRAM)
   renderVisualLab(root, visualLabState)
 
   apiKeyInput.addEventListener('change', () => persistField(STORAGE_KEYS.apiKey, apiKeyInput.value.trim()))
@@ -394,7 +399,7 @@ export function createApp(root, dependencies = {}) {
   })
 
   el('[data-action="load-example-json"]', root).addEventListener('click', async () => {
-    jsonEditor.value = formatJson(EXAMPLE_PROGRAM)
+    jsonEditor.setValue(formatJson(EXAMPLE_PROGRAM))
     await renderProgram(root, viewer, EXAMPLE_PROGRAM, appState, { jsonEditor })
   })
 
@@ -489,7 +494,7 @@ export function createApp(root, dependencies = {}) {
 
   el('[data-action="render-json"]', root).addEventListener('click', async () => {
     try {
-      const parsed = JSON.parse(jsonEditor.value)
+      const parsed = JSON.parse(jsonEditor.getValue())
       await renderProgram(root, viewer, parsed, appState, { jsonEditor })
     } catch (error) {
       setError(root, error instanceof Error ? error.message : String(error))
@@ -508,7 +513,7 @@ export function createApp(root, dependencies = {}) {
         model: modelInput.value.trim() || 'deepseek-chat',
         description: descriptionInput.value.trim(),
       })
-      jsonEditor.value = formatJson(program)
+      jsonEditor.setValue(formatJson(program))
       await renderProgram(root, viewer, program, appState, { jsonEditor })
     } catch (error) {
       setError(root, error instanceof Error ? error.message : String(error))
@@ -517,11 +522,6 @@ export function createApp(root, dependencies = {}) {
       toggleBusy(root, false)
     }
   })
-
-  const syncFocusHandler = () => syncEditorFocus(root, viewer, jsonEditor, appState)
-  jsonEditor.addEventListener('click', syncFocusHandler)
-  jsonEditor.addEventListener('keyup', syncFocusHandler)
-  jsonEditor.addEventListener('input', syncFocusHandler)
 
   renderProgram(root, viewer, EXAMPLE_PROGRAM, appState, { jsonEditor }).catch((error) => {
     setError(root, error instanceof Error ? error.message : String(error))
