@@ -76,4 +76,24 @@ describe('createApp', () => {
     expect(editorValue).toContain('"size": [')
     expect(editorValue).toContain('200')
   })
+
+  test('updates action focus hint when cursor moves inside an action block', async () => {
+    const render = vi.fn()
+
+    createApp(document.querySelector('#app'), {
+      createViewer: () => ({ render, exportStl: vi.fn() }),
+    })
+
+    await flushPromises()
+
+    const editor = document.querySelector('[data-role="json-editor"]')
+    const subtractOffset = editor.value.indexOf('"action": "boolean.subtract"')
+    editor.focus()
+    editor.setSelectionRange(subtractOffset, subtractOffset)
+    editor.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'ArrowDown' }))
+
+    expect(document.querySelector('[data-role="action-focus"]').textContent).toContain('body / boolean.subtract')
+    expect(document.querySelector('[data-role="viewer-focus-mode"]').textContent).toContain('base + tools + result')
+    expect(render).toHaveBeenCalled()
+  })
 })

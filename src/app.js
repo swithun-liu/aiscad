@@ -1,5 +1,6 @@
 import { generateDslWithDeepSeek } from './lib/deepseek.js'
 import { actionDefinitions } from './lib/dsl/definitions.js'
+import { buildActionFocusView, getActionIdAtCursor } from './lib/dsl/action-focus.js'
 import { validateAndCompileProgram } from './lib/dsl/compiler.js'
 import { buildDslPrompt, SUPPORTED_ACTION_NAMES } from './lib/dsl/prompt.js'
 import { ThreeCadViewer } from './lib/renderer/three-viewer.js'
@@ -119,6 +120,23 @@ function formatMetricValue(value) {
   return JSON.stringify(value)
 }
 
+function setActionFocusUi(root, focusView) {
+  const jsonFocus = el('[data-role="action-focus"]', root)
+  const viewerName = el('[data-role="viewer-focus-name"]', root)
+  const viewerMode = el('[data-role="viewer-focus-mode"]', root)
+
+  if (!focusView) {
+    jsonFocus.textContent = '当前 action: 未聚焦，右侧显示完整模型。'
+    viewerName.textContent = '当前查看: 完整模型'
+    viewerMode.textContent = '模式: final result'
+    return
+  }
+
+  jsonFocus.textContent = `当前 action: ${focusView.actionId} / ${focusView.actionName}。${focusView.summary}`
+  viewerName.textContent = `当前查看: ${focusView.actionId} / ${focusView.actionName}`
+  viewerMode.textContent = `模式: ${focusView.modeLabel}`
+}
+
 function renderVisualLab(root, state) {
   const summary = el('[data-role="test-summary"]', root)
   const list = el('[data-role="test-cases"]', root)
@@ -194,11 +212,42 @@ function toggleBusy(root, busy) {
   })
 }
 
-async function renderProgram(root, viewer, source) {
+function syncEditorFocus(root, viewer, jsonEditor, appState) {
+  if (!appState.compiled) {
+    setActionFocusUi(root, null)
+    return
+  }
+
+  const actionId = getActionIdAtCursor(jsonEditor.value, jsonEditor.selectionStart || 0)
+  const focusView = buildActionFocusView(appState.compiled, actionId)
+  appState.focusedActionId = focusView?.actionId || null
+  setActionFocusUi(root, focusView)
+
+  if (focusView) {
+    viewer.render(focusView.layers, {
+      fitCamera: false,
+      exportRecords: appState.compiled.renderables,
+    })
+    return
+  }
+
+  viewer.render(appState.compiled.renderables, {
+    exportRecords: appState.compiled.renderables,
+  })
+}
+
+async function renderProgram(root, viewer, source, appState, options = {}) {
   const result = validateAndCompileProgram(source)
-  viewer.render(result.renderables)
+  appState.compiled = result
+  viewer.render(result.renderables, {
+    exportRecords: result.renderables,
+  })
   setStatus(root, `渲染成功，共执行 ${source.actions.length} 条 action。`, 'success')
   setError(root)
+  setActionFocusUi(root, null)
+  if (options.syncFocus !== false) {
+    syncEditorFocus(root, viewer, options.jsonEditor, appState)
+  }
   return result
 }
 
@@ -270,6 +319,7 @@ export function createApp(root, dependencies = {}) {
             <span class="muted">可直接手动修改后重新渲染</span>
           </div>
           <textarea data-role="json-editor" class="json-editor" spellcheck="false"></textarea>
+          <div class="action-focus-hint muted" data-role="action-focus">当前 action: 未聚焦，右侧显示完整模型。</div>
         </section>
 
         <section class="panel card viewer-panel">
@@ -277,7 +327,13 @@ export function createApp(root, dependencies = {}) {
             <h2>模型预览</h2>
             <span class="muted">Three.js 渲染 JSCAD 几何</span>
           </div>
-          <div class="viewer" data-role="viewer"></div>
+          <div class="viewer-stage">
+            <div class="viewer-focus-badges">
+              <span class="viewer-badge" data-role="viewer-focus-name">当前查看: 完整模型</span>
+              <span class="viewer-badge muted" data-role="viewer-focus-mode">模式: final result</span>
+            </div>
+            <div class="viewer" data-role="viewer"></div>
+          </div>
           <section class="test-lab card nested-card">
             <div class="panel-header compact-header">
               <h2>测试案例</h2>
@@ -301,6 +357,10 @@ export function createApp(root, dependencies = {}) {
   const visualLabState = {
     activeCaseId: VISUAL_TEST_CASES[0]?.id || null,
     results: [],
+  }
+  const appState = {
+    compiled: null,
+    focusedActionId: null,
   }
 
   apiKeyInput.value = readField(STORAGE_KEYS.apiKey)
@@ -335,7 +395,7 @@ export function createApp(root, dependencies = {}) {
 
   el('[data-action="load-example-json"]', root).addEventListener('click', async () => {
     jsonEditor.value = formatJson(EXAMPLE_PROGRAM)
-    await renderProgram(root, viewer, EXAMPLE_PROGRAM)
+    await renderProgram(root, viewer, EXAMPLE_PROGRAM, appState, { jsonEditor })
   })
 
   el('[data-action="run-all-cases"]', root).addEventListener('click', async () => {
@@ -349,7 +409,11 @@ export function createApp(root, dependencies = {}) {
       const activeResult = visualLabState.results.find((item) => item.caseId === activeCase?.id)
       if (activeCase && activeResult?.compiled) {
         loadProgramIntoEditor(root, descriptionInput, jsonEditor, activeCase)
-        viewer.render(activeResult.compiled.renderables)
+        appState.compiled = activeResult.compiled
+        viewer.render(activeResult.compiled.renderables, {
+          exportRecords: activeResult.compiled.renderables,
+        })
+        syncEditorFocus(root, viewer, jsonEditor, appState)
       }
 
       const failedCount = visualLabState.results.filter((item) => !item.passed).length
@@ -384,7 +448,11 @@ export function createApp(root, dependencies = {}) {
         result,
       ]
       loadProgramIntoEditor(root, descriptionInput, jsonEditor, testCase)
-      viewer.render(result.compiled.renderables)
+      appState.compiled = result.compiled
+      viewer.render(result.compiled.renderables, {
+        exportRecords: result.compiled.renderables,
+      })
+      syncEditorFocus(root, viewer, jsonEditor, appState)
       renderVisualLab(root, visualLabState)
       setError(root)
       setStatus(root, `已预览测试案例“${testCase.name}”，你可以直接肉眼检查模型效果。`, result.passed ? 'success' : 'error')
@@ -422,7 +490,7 @@ export function createApp(root, dependencies = {}) {
   el('[data-action="render-json"]', root).addEventListener('click', async () => {
     try {
       const parsed = JSON.parse(jsonEditor.value)
-      await renderProgram(root, viewer, parsed)
+      await renderProgram(root, viewer, parsed, appState, { jsonEditor })
     } catch (error) {
       setError(root, error instanceof Error ? error.message : String(error))
       setStatus(root, '渲染失败', 'error')
@@ -441,7 +509,7 @@ export function createApp(root, dependencies = {}) {
         description: descriptionInput.value.trim(),
       })
       jsonEditor.value = formatJson(program)
-      await renderProgram(root, viewer, program)
+      await renderProgram(root, viewer, program, appState, { jsonEditor })
     } catch (error) {
       setError(root, error instanceof Error ? error.message : String(error))
       setStatus(root, '生成失败', 'error')
@@ -450,7 +518,12 @@ export function createApp(root, dependencies = {}) {
     }
   })
 
-  renderProgram(root, viewer, EXAMPLE_PROGRAM).catch((error) => {
+  const syncFocusHandler = () => syncEditorFocus(root, viewer, jsonEditor, appState)
+  jsonEditor.addEventListener('click', syncFocusHandler)
+  jsonEditor.addEventListener('keyup', syncFocusHandler)
+  jsonEditor.addEventListener('input', syncFocusHandler)
+
+  renderProgram(root, viewer, EXAMPLE_PROGRAM, appState, { jsonEditor }).catch((error) => {
     setError(root, error instanceof Error ? error.message : String(error))
     setStatus(root, '初始化失败', 'error')
   })

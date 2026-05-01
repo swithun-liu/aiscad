@@ -70,6 +70,52 @@ function curveToLineSegments(curve) {
   return bufferGeometry
 }
 
+function normalizeLayer(item) {
+  if (item?.record) return item
+  return { record: item, style: {} }
+}
+
+function createRenderableObject(record, style = {}) {
+  const rgba = style.color || record.color
+  const color = colorFromRgba(rgba)
+  const opacity = style.opacity ?? (rgba?.[3] ?? 1)
+  const transparent = opacity < 1
+
+  if (record.kind === 'geom3') {
+    const geometry = geom3ToBufferGeometry(record.value)
+    const material = new THREE.MeshStandardMaterial({
+      color,
+      metalness: 0.08,
+      roughness: 0.72,
+      transparent,
+      opacity,
+      depthWrite: opacity >= 0.9,
+      wireframe: Boolean(style.wireframe),
+    })
+    const mesh = new THREE.Mesh(geometry, material)
+    mesh.renderOrder = style.renderOrder || 0
+    return mesh
+  }
+
+  if (record.kind === 'geom2') {
+    const geometry = geom2ToLineSegments(record.value)
+    const material = new THREE.LineBasicMaterial({ color, transparent, opacity })
+    const lines = new THREE.LineSegments(geometry, material)
+    lines.renderOrder = style.renderOrder || 0
+    return lines
+  }
+
+  if (record.kind === 'curve2') {
+    const geometry = curveToLineSegments(record.value)
+    const material = new THREE.LineBasicMaterial({ color, transparent, opacity })
+    const lines = new THREE.LineSegments(geometry, material)
+    lines.renderOrder = style.renderOrder || 0
+    return lines
+  }
+
+  return null
+}
+
 export class ThreeCadViewer {
   constructor(container) {
     this.container = container
@@ -88,6 +134,7 @@ export class ThreeCadViewer {
     this.controls.enableDamping = true
     this.controls.target.set(0, 0, 0)
     this.stlExporter = new STLExporter()
+    this.exportRecords = []
 
     this.modelRoot = new THREE.Group()
     this.scene.add(this.modelRoot)
@@ -142,30 +189,21 @@ export class ThreeCadViewer {
     this.controls.update()
   }
 
-  render(records) {
+  render(records, options = {}) {
     this.clear()
+    this.exportRecords = options.exportRecords || records.map((item) => normalizeLayer(item).record)
 
-    for (const record of records) {
-      const color = colorFromRgba(record.color)
-      if (record.kind === 'geom3') {
-        const geometry = geom3ToBufferGeometry(record.value)
-        const material = new THREE.MeshStandardMaterial({ color, metalness: 0.08, roughness: 0.72 })
-        const mesh = new THREE.Mesh(geometry, material)
-        this.modelRoot.add(mesh)
-      } else if (record.kind === 'geom2') {
-        const geometry = geom2ToLineSegments(record.value)
-        const material = new THREE.LineBasicMaterial({ color })
-        const lines = new THREE.LineSegments(geometry, material)
-        this.modelRoot.add(lines)
-      } else if (record.kind === 'curve2') {
-        const geometry = curveToLineSegments(record.value)
-        const material = new THREE.LineBasicMaterial({ color })
-        const lines = new THREE.LineSegments(geometry, material)
-        this.modelRoot.add(lines)
+    for (const item of records) {
+      const layer = normalizeLayer(item)
+      const object3d = createRenderableObject(layer.record, layer.style)
+      if (object3d) {
+        this.modelRoot.add(object3d)
       }
     }
 
-    this.fitCamera()
+    if (options.fitCamera !== false) {
+      this.fitCamera()
+    }
   }
 
   hasSolidMeshes() {
@@ -177,11 +215,22 @@ export class ThreeCadViewer {
   }
 
   exportStl(fileName = 'aiscad-model.stl') {
-    if (!this.hasSolidMeshes()) {
+    const solidRecords = this.exportRecords.filter((record) => record.kind === 'geom3')
+    if (solidRecords.length === 0) {
       throw new Error('当前没有可导出的 3D 实体，请先渲染包含 geom3 的模型。')
     }
 
-    const stlText = this.stlExporter.parse(this.modelRoot)
+    const exportGroup = new THREE.Group()
+    for (const record of solidRecords) {
+      const object3d = createRenderableObject(record, {})
+      if (object3d) exportGroup.add(object3d)
+    }
+
+    const stlText = this.stlExporter.parse(exportGroup)
+    exportGroup.traverse((child) => {
+      child.geometry?.dispose?.()
+      child.material?.dispose?.()
+    })
     const blob = new Blob([stlText], { type: 'model/stl' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
