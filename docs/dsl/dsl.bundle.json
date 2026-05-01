@@ -411,6 +411,65 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "按点序生成折线路径，可开可闭",
+            "requiredParams": [
+              "points"
+            ],
+            "paramGuide": {
+              "points": "point2[]，二维点数组。 点列表，按顺序定义轮廓或路径。",
+              "closed": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否闭合路径或扫掠轨迹。 默认值 false。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要先描述二维路径，再决定是否闭合成草图时使用。",
+              "当后续会拼接路径、闭合轮廓或沿路径扫掠时使用。"
+            ],
+            "whenNotToUse": [
+              "不要把 curve2 直接当成最终可打印实体输出。"
+            ],
+            "commonMistakes": [
+              "路径点顺序混乱，导致轮廓方向或闭合关系异常。",
+              "把开路径误当成可直接拉伸的封闭草图。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "curve.close",
+              "sketch.fromCurve",
+              "construct.extrudeRectangular"
+            ],
+            "stabilityNotes": [
+              "复杂实体优先先得到稳定的二维轮廓，再进入 sketch 或 construct 阶段。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是二维路径，不具备面积与厚度，通常用于闭合、扫掠或转成草图。",
+            "example": {
+              "id": "curve_line_example",
+              "action": "curve.line",
+              "params": {
+                "points": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    40,
+                    0
+                  ],
+                  [
+                    40,
+                    20
+                  ],
+                  [
+                    0,
+                    20
+                  ]
+                ],
+                "closed": false
+              }
+            }
           }
         },
         "curve.arc": {
@@ -439,10 +498,69 @@
                 "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
               },
               "segments": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 32,
+                "minimum": 4
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "生成圆弧路径",
+            "requiredParams": [
+              "center",
+              "radius",
+              "startAngle",
+              "endAngle"
+            ],
+            "paramGuide": {
+              "center": "vector2，长度为 2 的数值数组。 中心点坐标。",
+              "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+              "startAngle": "number，数值，或 {\"$var\":\"变量名\"}。 起始角度，单位为度。",
+              "endAngle": "number，数值，或 {\"$var\":\"变量名\"}。 结束角度，单位为度。",
+              "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
+            },
+            "constraints": [
+              "segments 省略时默认使用 32。",
+              "segments 若填写，必须大于等于 4。"
+            ],
+            "whenToUse": [
+              "需要先描述二维路径，再决定是否闭合成草图时使用。",
+              "当后续会拼接路径、闭合轮廓或沿路径扫掠时使用。"
+            ],
+            "whenNotToUse": [
+              "不要把 curve2 直接当成最终可打印实体输出。"
+            ],
+            "commonMistakes": [
+              "路径点顺序混乱，导致轮廓方向或闭合关系异常。",
+              "把开路径误当成可直接拉伸的封闭草图。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "curve.close",
+              "sketch.fromCurve",
+              "construct.extrudeRectangular"
+            ],
+            "stabilityNotes": [
+              "复杂实体优先先得到稳定的二维轮廓，再进入 sketch 或 construct 阶段。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是二维路径，不具备面积与厚度，通常用于闭合、扫掠或转成草图。",
+            "example": {
+              "id": "curve_arc_example",
+              "action": "curve.arc",
+              "params": {
+                "center": [
+                  0,
+                  0
+                ],
+                "radius": 10,
+                "startAngle": 0,
+                "endAngle": 180,
+                "segments": 32
+              }
+            }
           }
         },
         "curve.bezier": {
@@ -459,10 +577,70 @@
                 "$ref": "aiscad.dsl/actions/common.types#/$defs/point2List"
               },
               "segments": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 32,
+                "minimum": 4
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "按控制点生成贝塞尔路径",
+            "requiredParams": [
+              "controlPoints"
+            ],
+            "paramGuide": {
+              "controlPoints": "point2[]，二维点数组。 控制点列表，用于贝塞尔路径。",
+              "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
+            },
+            "constraints": [
+              "segments 省略时默认使用 32。",
+              "segments 若填写，必须大于等于 4。"
+            ],
+            "whenToUse": [
+              "需要先描述二维路径，再决定是否闭合成草图时使用。",
+              "当后续会拼接路径、闭合轮廓或沿路径扫掠时使用。"
+            ],
+            "whenNotToUse": [
+              "不要把 curve2 直接当成最终可打印实体输出。"
+            ],
+            "commonMistakes": [
+              "路径点顺序混乱，导致轮廓方向或闭合关系异常。",
+              "把开路径误当成可直接拉伸的封闭草图。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "curve.close",
+              "sketch.fromCurve",
+              "construct.extrudeRectangular"
+            ],
+            "stabilityNotes": [
+              "复杂实体优先先得到稳定的二维轮廓，再进入 sketch 或 construct 阶段。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是二维路径，不具备面积与厚度，通常用于闭合、扫掠或转成草图。",
+            "example": {
+              "id": "curve_bezier_example",
+              "action": "curve.bezier",
+              "params": {
+                "controlPoints": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    20,
+                    30
+                  ],
+                  [
+                    40,
+                    0
+                  ]
+                ],
+                "segments": 32
+              }
+            }
           }
         },
         "curve.concat": {
@@ -486,6 +664,51 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "拼接多个路径，保持路径语义",
+            "requiredParams": [
+              "sources"
+            ],
+            "paramGuide": {
+              "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。",
+              "closed": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否闭合路径或扫掠轨迹。 默认值 false。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要先描述二维路径，再决定是否闭合成草图时使用。",
+              "当后续会拼接路径、闭合轮廓或沿路径扫掠时使用。"
+            ],
+            "whenNotToUse": [
+              "不要把 curve2 直接当成最终可打印实体输出。"
+            ],
+            "commonMistakes": [
+              "路径点顺序混乱，导致轮廓方向或闭合关系异常。",
+              "把开路径误当成可直接拉伸的封闭草图。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "curve.close",
+              "sketch.fromCurve",
+              "construct.extrudeRectangular"
+            ],
+            "stabilityNotes": [
+              "复杂实体优先先得到稳定的二维轮廓，再进入 sketch 或 construct 阶段。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：curve2。",
+            "outputMeaning": "输出是二维路径，不具备面积与厚度，通常用于闭合、扫掠或转成草图。",
+            "example": {
+              "id": "curve_concat_example",
+              "action": "curve.concat",
+              "params": {
+                "sources": [
+                  "path_a",
+                  "path_b"
+                ],
+                "closed": false
+              }
+            }
           }
         },
         "curve.close": {
@@ -505,8 +728,58 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "将开路径闭合为闭路径",
+            "requiredParams": [
+              "source"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要先描述二维路径，再决定是否闭合成草图时使用。",
+              "当后续会拼接路径、闭合轮廓或沿路径扫掠时使用。"
+            ],
+            "whenNotToUse": [
+              "不要把 curve2 直接当成最终可打印实体输出。"
+            ],
+            "commonMistakes": [
+              "路径点顺序混乱，导致轮廓方向或闭合关系异常。",
+              "把开路径误当成可直接拉伸的封闭草图。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "curve.close",
+              "sketch.fromCurve",
+              "construct.extrudeRectangular"
+            ],
+            "stabilityNotes": [
+              "复杂实体优先先得到稳定的二维轮廓，再进入 sketch 或 construct 阶段。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：curve2。",
+            "outputMeaning": "输出是二维路径，不具备面积与厚度，通常用于闭合、扫掠或转成草图。",
+            "example": {
+              "id": "curve_close_example",
+              "action": "curve.close",
+              "params": {
+                "source": "open_path"
+              }
+            }
           }
         }
+      },
+      "llm": {
+        "purpose": "二维路径与曲线 action 定义。",
+        "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+        "actionReadingOrder": [
+          "先看 summary 判断作用。",
+          "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+          "再按 requiredParams 与 paramGuide 填参数。",
+          "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+        ]
       }
     },
     "sketches": {
@@ -538,10 +811,62 @@
                 ]
               },
               "segments": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 32,
+                "minimum": 4
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "生成圆形草图",
+            "requiredParams": [
+              "radius"
+            ],
+            "paramGuide": {
+              "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+              "center": "vector2，长度为 2 的数值数组。 中心点坐标。 默认值 [0, 0]。",
+              "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
+            },
+            "constraints": [
+              "segments 省略时默认使用 32。",
+              "segments 若填写，必须大于等于 4。"
+            ],
+            "whenToUse": [
+              "需要生成二维截面、轮廓或拉伸前草图时使用。",
+              "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+            ],
+            "whenNotToUse": [
+              "不要把 geom2 当成已经具有厚度的实体理解。"
+            ],
+            "commonMistakes": [
+              "草图还未封闭就直接进入实体构造。",
+              "把过多细节堆在单个草图里，导致后续布尔难维护。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "construct.extrudeLinear",
+              "modify.offset2d",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
+            "example": {
+              "id": "sketch_circle_example",
+              "action": "sketch.circle",
+              "params": {
+                "radius": 12,
+                "center": [
+                  0,
+                  0
+                ],
+                "segments": 32
+              }
+            }
           }
         },
         "sketch.ellipse": {
@@ -565,10 +890,65 @@
                 ]
               },
               "segments": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 32,
+                "minimum": 4
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "生成椭圆草图",
+            "requiredParams": [
+              "radius"
+            ],
+            "paramGuide": {
+              "radius": "vector2，长度为 2 的数值数组。 半径。",
+              "center": "vector2，长度为 2 的数值数组。 中心点坐标。 默认值 [0, 0]。",
+              "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
+            },
+            "constraints": [
+              "segments 省略时默认使用 32。",
+              "segments 若填写，必须大于等于 4。"
+            ],
+            "whenToUse": [
+              "需要生成二维截面、轮廓或拉伸前草图时使用。",
+              "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+            ],
+            "whenNotToUse": [
+              "不要把 geom2 当成已经具有厚度的实体理解。"
+            ],
+            "commonMistakes": [
+              "草图还未封闭就直接进入实体构造。",
+              "把过多细节堆在单个草图里，导致后续布尔难维护。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "construct.extrudeLinear",
+              "modify.offset2d",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
+            "example": {
+              "id": "sketch_ellipse_example",
+              "action": "sketch.ellipse",
+              "params": {
+                "radius": [
+                  20,
+                  10
+                ],
+                "center": [
+                  0,
+                  0
+                ],
+                "segments": 32
+              }
+            }
           }
         },
         "sketch.rectangle": {
@@ -593,6 +973,54 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "生成矩形草图",
+            "requiredParams": [
+              "size"
+            ],
+            "paramGuide": {
+              "size": "vector2，长度为 2 的数值数组。 尺寸向量。2D 时为 [x, y]，3D 时为 [x, y, z]。",
+              "center": "vector2，长度为 2 的数值数组。 中心点坐标。 默认值 [0, 0]。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要生成二维截面、轮廓或拉伸前草图时使用。",
+              "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+            ],
+            "whenNotToUse": [
+              "不要把 geom2 当成已经具有厚度的实体理解。"
+            ],
+            "commonMistakes": [
+              "草图还未封闭就直接进入实体构造。",
+              "把过多细节堆在单个草图里，导致后续布尔难维护。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "construct.extrudeLinear",
+              "modify.offset2d",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
+            "example": {
+              "id": "sketch_rectangle_example",
+              "action": "sketch.rectangle",
+              "params": {
+                "size": [
+                  40,
+                  20
+                ],
+                "center": [
+                  0,
+                  0
+                ]
+              }
+            }
           }
         },
         "sketch.roundedRectangle": {
@@ -619,15 +1047,69 @@
               "radius": {
                 "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
               },
-              "style": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/cornerStyle",
-                "default": "round"
-              },
               "segments": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 32,
+                "minimum": 4
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "生成圆角或倒角矩形草图",
+            "requiredParams": [
+              "size",
+              "radius"
+            ],
+            "paramGuide": {
+              "size": "vector2，长度为 2 的数值数组。 尺寸向量。2D 时为 [x, y]，3D 时为 [x, y, z]。",
+              "center": "vector2，长度为 2 的数值数组。 中心点坐标。 默认值 [0, 0]。",
+              "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+              "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
+            },
+            "constraints": [
+              "segments 省略时默认使用 32。",
+              "segments 若填写，必须大于等于 4。"
+            ],
+            "whenToUse": [
+              "需要生成二维截面、轮廓或拉伸前草图时使用。",
+              "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+            ],
+            "whenNotToUse": [
+              "不要把 geom2 当成已经具有厚度的实体理解。"
+            ],
+            "commonMistakes": [
+              "草图还未封闭就直接进入实体构造。",
+              "把过多细节堆在单个草图里，导致后续布尔难维护。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "construct.extrudeLinear",
+              "modify.offset2d",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
+            "example": {
+              "id": "sketch_roundedRectangle_example",
+              "action": "sketch.roundedRectangle",
+              "params": {
+                "size": [
+                  40,
+                  20
+                ],
+                "center": [
+                  0,
+                  0
+                ],
+                "radius": 4,
+                "segments": 32
+              }
+            }
           }
         },
         "sketch.polygon": {
@@ -645,6 +1127,63 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "通过点集直接生成多边形草图",
+            "requiredParams": [
+              "points"
+            ],
+            "paramGuide": {
+              "points": "point2[]，二维点数组。 点列表，按顺序定义轮廓或路径。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要生成二维截面、轮廓或拉伸前草图时使用。",
+              "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+            ],
+            "whenNotToUse": [
+              "不要把 geom2 当成已经具有厚度的实体理解。"
+            ],
+            "commonMistakes": [
+              "草图还未封闭就直接进入实体构造。",
+              "把过多细节堆在单个草图里，导致后续布尔难维护。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "construct.extrudeLinear",
+              "modify.offset2d",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
+            "example": {
+              "id": "sketch_polygon_example",
+              "action": "sketch.polygon",
+              "params": {
+                "points": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    40,
+                    0
+                  ],
+                  [
+                    30,
+                    20
+                  ],
+                  [
+                    0,
+                    20
+                  ]
+                ]
+              }
+            }
           }
         },
         "sketch.fromCurve": {
@@ -664,6 +1203,46 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "将闭合曲线转为封闭草图",
+            "requiredParams": [
+              "source"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要生成二维截面、轮廓或拉伸前草图时使用。",
+              "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+            ],
+            "whenNotToUse": [
+              "不要把 geom2 当成已经具有厚度的实体理解。"
+            ],
+            "commonMistakes": [
+              "草图还未封闭就直接进入实体构造。",
+              "把过多细节堆在单个草图里，导致后续布尔难维护。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "construct.extrudeLinear",
+              "modify.offset2d",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：curve2。",
+            "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
+            "example": {
+              "id": "sketch_fromCurve_example",
+              "action": "sketch.fromCurve",
+              "params": {
+                "source": "closed_path"
+              }
+            }
           }
         },
         "sketch.text": {
@@ -707,8 +1286,70 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": false,
+            "summary": "生成文本轮廓草图，适合压印和雕刻",
+            "requiredParams": [
+              "text",
+              "fontSize"
+            ],
+            "paramGuide": {
+              "text": "string，字符串，或 {\"$var\":\"变量名\"}。 文本内容。",
+              "fontSize": "number，数值，或 {\"$var\":\"变量名\"}。 字体尺寸。",
+              "align": "enum，可选值：left / center / right。 文本对齐方式。 默认值 \"left\"。",
+              "lineSpacing": "number，数值，或 {\"$var\":\"变量名\"}。 行间距。",
+              "letterSpacing": "number，数值，或 {\"$var\":\"变量名\"}。 字间距。",
+              "position": "vector2，长度为 2 的数值数组。 文本位置。 默认值 [0, 0]。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要生成二维截面、轮廓或拉伸前草图时使用。",
+              "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+            ],
+            "whenNotToUse": [
+              "不要把 geom2 当成已经具有厚度的实体理解。"
+            ],
+            "commonMistakes": [
+              "草图还未封闭就直接进入实体构造。",
+              "把过多细节堆在单个草图里，导致后续布尔难维护。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "construct.extrudeLinear",
+              "modify.offset2d",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
+            "example": {
+              "id": "sketch_text_example",
+              "action": "sketch.text",
+              "params": {
+                "text": "AISCAD",
+                "fontSize": 12,
+                "align": "center",
+                "position": [
+                  0,
+                  0
+                ]
+              }
+            }
           }
         }
+      },
+      "llm": {
+        "purpose": "二维封闭草图 action 定义。",
+        "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+        "actionReadingOrder": [
+          "先看 summary 判断作用。",
+          "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+          "再按 requiredParams 与 paramGuide 填参数。",
+          "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+        ]
       }
     },
     "solids": {
@@ -742,6 +1383,56 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "生成长方体",
+            "requiredParams": [
+              "size"
+            ],
+            "paramGuide": {
+              "size": "vector3，长度为 3 的数值数组。 尺寸向量。2D 时为 [x, y]，3D 时为 [x, y, z]。",
+              "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "可以直接用基础体表达主体时优先使用。",
+              "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+            ],
+            "whenNotToUse": [
+              "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+            ],
+            "commonMistakes": [
+              "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "transform.translate",
+              "transform.rotate",
+              "boolean.union",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "solid_box_example",
+              "action": "solid.box",
+              "params": {
+                "size": [
+                  40,
+                  20,
+                  10
+                ],
+                "center": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
           }
         },
         "solid.roundedBox": {
@@ -769,15 +1460,71 @@
               "radius": {
                 "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
               },
-              "style": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/cornerStyle",
-                "default": "round"
-              },
               "segments": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 32,
+                "minimum": 4
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "生成圆角或倒角长方体",
+            "requiredParams": [
+              "size",
+              "radius"
+            ],
+            "paramGuide": {
+              "size": "vector3，长度为 3 的数值数组。 尺寸向量。2D 时为 [x, y]，3D 时为 [x, y, z]。",
+              "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。",
+              "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+              "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
+            },
+            "constraints": [
+              "segments 省略时默认使用 32。",
+              "segments 若填写，必须大于等于 4。"
+            ],
+            "whenToUse": [
+              "可以直接用基础体表达主体时优先使用。",
+              "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+            ],
+            "whenNotToUse": [
+              "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+            ],
+            "commonMistakes": [
+              "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "transform.translate",
+              "transform.rotate",
+              "boolean.union",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "solid_roundedBox_example",
+              "action": "solid.roundedBox",
+              "params": {
+                "size": [
+                  40,
+                  20,
+                  10
+                ],
+                "center": [
+                  0,
+                  0,
+                  0
+                ],
+                "radius": 2,
+                "segments": 32
+              }
+            }
           }
         },
         "solid.sphere": {
@@ -802,10 +1549,63 @@
                 ]
               },
               "segments": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 32,
+                "minimum": 4
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "生成球体",
+            "requiredParams": [
+              "radius"
+            ],
+            "paramGuide": {
+              "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+              "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。",
+              "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
+            },
+            "constraints": [
+              "segments 省略时默认使用 32。",
+              "segments 若填写，必须大于等于 4。"
+            ],
+            "whenToUse": [
+              "可以直接用基础体表达主体时优先使用。",
+              "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+            ],
+            "whenNotToUse": [
+              "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+            ],
+            "commonMistakes": [
+              "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "transform.translate",
+              "transform.rotate",
+              "boolean.union",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "solid_sphere_example",
+              "action": "solid.sphere",
+              "params": {
+                "radius": 12,
+                "center": [
+                  0,
+                  0,
+                  0
+                ],
+                "segments": 32
+              }
+            }
           }
         },
         "solid.geodesicSphere": {
@@ -835,6 +1635,54 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "生成测地球，更适合低面数稳定拓扑",
+            "requiredParams": [
+              "radius"
+            ],
+            "paramGuide": {
+              "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+              "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。",
+              "frequency": "integer，整数，或 {\"$var\":\"变量名\"}。 测地球细分频率。 默认值 6。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "可以直接用基础体表达主体时优先使用。",
+              "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+            ],
+            "whenNotToUse": [
+              "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+            ],
+            "commonMistakes": [
+              "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "transform.translate",
+              "transform.rotate",
+              "boolean.union",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "solid_geodesicSphere_example",
+              "action": "solid.geodesicSphere",
+              "params": {
+                "radius": 12,
+                "center": [
+                  0,
+                  0,
+                  0
+                ],
+                "frequency": 6
+              }
+            }
           }
         },
         "solid.cylinder": {
@@ -868,7 +1716,9 @@
                 ]
               },
               "segments": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 32,
+                "minimum": 4
               }
             },
             "oneOf": [
@@ -887,6 +1737,62 @@
               }
             ],
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "生成正圆柱或圆台",
+            "requiredParams": [
+              "height"
+            ],
+            "paramGuide": {
+              "height": "number，数值，或 {\"$var\":\"变量名\"}。 高度。",
+              "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+              "radiusTop": "number，数值，或 {\"$var\":\"变量名\"}。 顶部半径。",
+              "radiusBottom": "number，数值，或 {\"$var\":\"变量名\"}。 底部半径。",
+              "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。",
+              "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
+            },
+            "constraints": [
+              "必须满足 [height + radius] 或 [height + radiusTop + radiusBottom]。",
+              "segments 省略时默认使用 32。",
+              "segments 若填写，必须大于等于 4。"
+            ],
+            "whenToUse": [
+              "可以直接用基础体表达主体时优先使用。",
+              "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+            ],
+            "whenNotToUse": [
+              "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+            ],
+            "commonMistakes": [
+              "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "transform.translate",
+              "transform.rotate",
+              "boolean.union",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "solid_cylinder_example",
+              "action": "solid.cylinder",
+              "params": {
+                "height": 20,
+                "radius": 8,
+                "center": [
+                  0,
+                  0,
+                  0
+                ],
+                "segments": 32
+              }
+            }
           }
         },
         "solid.ellipticalCylinder": {
@@ -919,10 +1825,75 @@
                 ]
               },
               "segments": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 32,
+                "minimum": 4
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "生成椭圆截面柱体或锥台",
+            "requiredParams": [
+              "height",
+              "radiusTop",
+              "radiusBottom"
+            ],
+            "paramGuide": {
+              "height": "number，数值，或 {\"$var\":\"变量名\"}。 高度。",
+              "radiusTop": "vector2，长度为 2 的数值数组。 顶部半径。",
+              "radiusBottom": "vector2，长度为 2 的数值数组。 底部半径。",
+              "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。",
+              "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
+            },
+            "constraints": [
+              "segments 省略时默认使用 32。",
+              "segments 若填写，必须大于等于 4。"
+            ],
+            "whenToUse": [
+              "可以直接用基础体表达主体时优先使用。",
+              "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+            ],
+            "whenNotToUse": [
+              "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+            ],
+            "commonMistakes": [
+              "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "transform.translate",
+              "transform.rotate",
+              "boolean.union",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "solid_ellipticalCylinder_example",
+              "action": "solid.ellipticalCylinder",
+              "params": {
+                "height": 20,
+                "radiusTop": [
+                  6,
+                  4
+                ],
+                "radiusBottom": [
+                  10,
+                  8
+                ],
+                "center": [
+                  0,
+                  0,
+                  0
+                ],
+                "segments": 32
+              }
+            }
           }
         },
         "solid.roundedCylinder": {
@@ -955,10 +1926,69 @@
                 ]
               },
               "segments": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 32,
+                "minimum": 4
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "生成圆角柱体",
+            "requiredParams": [
+              "height",
+              "radius",
+              "roundRadius"
+            ],
+            "paramGuide": {
+              "height": "number，数值，或 {\"$var\":\"变量名\"}。 高度。",
+              "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
+              "roundRadius": "number，数值，或 {\"$var\":\"变量名\"}。 圆角半径。",
+              "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。",
+              "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
+            },
+            "constraints": [
+              "segments 省略时默认使用 32。",
+              "segments 若填写，必须大于等于 4。"
+            ],
+            "whenToUse": [
+              "可以直接用基础体表达主体时优先使用。",
+              "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+            ],
+            "whenNotToUse": [
+              "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+            ],
+            "commonMistakes": [
+              "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "transform.translate",
+              "transform.rotate",
+              "boolean.union",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "solid_roundedCylinder_example",
+              "action": "solid.roundedCylinder",
+              "params": {
+                "height": 20,
+                "radius": 8,
+                "roundRadius": 2,
+                "center": [
+                  0,
+                  0,
+                  0
+                ],
+                "segments": 32
+              }
+            }
           }
         },
         "solid.torus": {
@@ -998,6 +2028,61 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "生成圆环体",
+            "requiredParams": [
+              "innerRadius",
+              "outerRadius"
+            ],
+            "paramGuide": {
+              "innerRadius": "number，数值，或 {\"$var\":\"变量名\"}。 内半径。",
+              "outerRadius": "number，数值，或 {\"$var\":\"变量名\"}。 外半径。",
+              "innerSegments": "integer，整数，或 {\"$var\":\"变量名\"}。 内圈分段数。",
+              "outerSegments": "integer，整数，或 {\"$var\":\"变量名\"}。 外圈分段数。",
+              "innerRotation": "number，数值，或 {\"$var\":\"变量名\"}。 内圈旋转角度，单位为度。 默认值 0。",
+              "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "可以直接用基础体表达主体时优先使用。",
+              "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+            ],
+            "whenNotToUse": [
+              "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+            ],
+            "commonMistakes": [
+              "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "transform.translate",
+              "transform.rotate",
+              "boolean.union",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "solid_torus_example",
+              "action": "solid.torus",
+              "params": {
+                "innerRadius": 4,
+                "outerRadius": 12,
+                "innerSegments": 24,
+                "outerSegments": 48,
+                "innerRotation": 0,
+                "center": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
           }
         },
         "solid.polyhedron": {
@@ -1036,8 +2121,105 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "通过顶点和面定义任意三维网格实体",
+            "requiredParams": [
+              "points",
+              "faces"
+            ],
+            "paramGuide": {
+              "points": "point3[]，三维点数组。 点列表，按顺序定义轮廓或路径。",
+              "faces": "array，数组。 面索引列表。",
+              "orientation": "enum，可选值：outward / inward。 多面体面朝向。 默认值 \"outward\"。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "可以直接用基础体表达主体时优先使用。",
+              "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+            ],
+            "whenNotToUse": [
+              "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+            ],
+            "commonMistakes": [
+              "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "transform.translate",
+              "transform.rotate",
+              "boolean.union",
+              "boolean.subtract"
+            ],
+            "stabilityNotes": [
+              "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "solid_polyhedron_example",
+              "action": "solid.polyhedron",
+              "params": {
+                "points": [
+                  [
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    20,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    20,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    20
+                  ]
+                ],
+                "faces": [
+                  [
+                    0,
+                    1,
+                    2
+                  ],
+                  [
+                    0,
+                    1,
+                    3
+                  ],
+                  [
+                    0,
+                    2,
+                    3
+                  ],
+                  [
+                    1,
+                    2,
+                    3
+                  ]
+                ],
+                "orientation": "outward"
+              }
+            }
           }
         }
+      },
+      "llm": {
+        "purpose": "三维原语 action 定义。",
+        "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+        "actionReadingOrder": [
+          "先看 summary 判断作用。",
+          "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+          "再按 requiredParams 与 paramGuide 填参数。",
+          "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+        ]
       }
     },
     "construct": {
@@ -1074,6 +2256,62 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "将二维草图沿法向线性拉伸成实体",
+            "requiredParams": [
+              "source",
+              "height"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+              "height": "number，数值，或 {\"$var\":\"变量名\"}。 高度。",
+              "twistAngle": "number，数值，或 {\"$var\":\"变量名\"}。 拉伸扭转角度，单位为度。 默认值 0。",
+              "twistSteps": "integer，整数，或 {\"$var\":\"变量名\"}。 扭转插值步数。 默认值 1。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。",
+              "板件、法兰、孔槽、轮廓类实体通常优先用它从稳定草图得到实体。"
+            ],
+            "whenNotToUse": [
+              "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+            ],
+            "commonMistakes": [
+              "把 2D 中间态当成最终实体结果。",
+              "对不稳定草图直接拉伸，导致后续布尔复杂度升高。",
+              "source 仍是开路径或无效草图。",
+              "得到 geom3 后又继续按二维心智理解结果。"
+            ],
+            "recommendedBefore": [
+              "sketch.rectangle",
+              "sketch.circle",
+              "sketch.polygon",
+              "sketch.fromCurve"
+            ],
+            "recommendedAfter": [
+              "transform.translate",
+              "boolean.subtract",
+              "display.color",
+              "boolean.union"
+            ],
+            "stabilityNotes": [
+              "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。",
+              "这是从二维草图进入可打印实体的常见稳定路径。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom2。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "construct_extrudeLinear_example",
+              "action": "construct.extrudeLinear",
+              "params": {
+                "source": "profile",
+                "height": 20,
+                "twistAngle": 0,
+                "twistSteps": 1
+              }
+            }
           }
         },
         "construct.extrudeRotate": {
@@ -1096,7 +2334,9 @@
                 "default": 360
               },
               "segments": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 32,
+                "minimum": 4
               },
               "axis": {
                 "$ref": "aiscad.dsl/actions/common.types#/$defs/axis",
@@ -1104,6 +2344,59 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "将二维剖面绕轴旋转生成回转体",
+            "requiredParams": [
+              "source"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+              "angle": "number，数值，或 {\"$var\":\"变量名\"}。 旋转总角度，单位为度。 默认值 360。",
+              "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。",
+              "axis": "enum，只能是 x、y、z。 坐标轴，只能是 x / y / z。 默认值 \"z\"。"
+            },
+            "constraints": [
+              "segments 省略时默认使用 32。",
+              "segments 若填写，必须大于等于 4。"
+            ],
+            "whenToUse": [
+              "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。"
+            ],
+            "whenNotToUse": [
+              "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+            ],
+            "commonMistakes": [
+              "把 2D 中间态当成最终实体结果。",
+              "对不稳定草图直接拉伸，导致后续布尔复杂度升高。"
+            ],
+            "recommendedBefore": [
+              "sketch.rectangle",
+              "sketch.circle",
+              "sketch.polygon",
+              "sketch.fromCurve"
+            ],
+            "recommendedAfter": [
+              "transform.translate",
+              "boolean.subtract",
+              "display.color"
+            ],
+            "stabilityNotes": [
+              "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom2。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "construct_extrudeRotate_example",
+              "action": "construct.extrudeRotate",
+              "params": {
+                "source": "profile",
+                "angle": 360,
+                "segments": 32,
+                "axis": "z"
+              }
+            }
           }
         },
         "construct.extrudeRectangular": {
@@ -1135,6 +2428,60 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "沿二维路径扫掠矩形截面",
+            "requiredParams": [
+              "source",
+              "size"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+              "size": "vector2，长度为 2 的数值数组。 尺寸向量。2D 时为 [x, y]，3D 时为 [x, y, z]。",
+              "closed": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否闭合路径或扫掠轨迹。 默认值 false。",
+              "caps": "enum，可选值为 none / start / end / both。 路径扫掠两端封口方式。 默认值 \"both\"。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。"
+            ],
+            "whenNotToUse": [
+              "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+            ],
+            "commonMistakes": [
+              "把 2D 中间态当成最终实体结果。",
+              "对不稳定草图直接拉伸，导致后续布尔复杂度升高。"
+            ],
+            "recommendedBefore": [
+              "sketch.rectangle",
+              "sketch.circle",
+              "sketch.polygon",
+              "sketch.fromCurve"
+            ],
+            "recommendedAfter": [
+              "transform.translate",
+              "boolean.subtract",
+              "display.color"
+            ],
+            "stabilityNotes": [
+              "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：curve2。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "construct_extrudeRectangular_example",
+              "action": "construct.extrudeRectangular",
+              "params": {
+                "source": "path",
+                "size": [
+                  4,
+                  10
+                ],
+                "closed": false,
+                "caps": "both"
+              }
+            }
           }
         },
         "construct.extrudeFromSlices": {
@@ -1184,6 +2531,66 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": false,
+            "summary": "通过一系列切片插值生成复杂扫掠实体",
+            "requiredParams": [
+              "source",
+              "slices"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+              "slices": "array，数组。 切片列表，用于按切片插值生成实体。",
+              "close": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 默认值 false。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。"
+            ],
+            "whenNotToUse": [
+              "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+            ],
+            "commonMistakes": [
+              "把 2D 中间态当成最终实体结果。",
+              "对不稳定草图直接拉伸，导致后续布尔复杂度升高。"
+            ],
+            "recommendedBefore": [
+              "sketch.rectangle",
+              "sketch.circle",
+              "sketch.polygon",
+              "sketch.fromCurve"
+            ],
+            "recommendedAfter": [
+              "transform.translate",
+              "boolean.subtract",
+              "display.color"
+            ],
+            "stabilityNotes": [
+              "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom2。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "construct_extrudeFromSlices_example",
+              "action": "construct.extrudeFromSlices",
+              "params": {
+                "source": "profile",
+                "slices": [
+                  {
+                    "offset": 0
+                  },
+                  {
+                    "offset": 20,
+                    "scale": [
+                      0.8,
+                      0.8
+                    ]
+                  }
+                ],
+                "close": false
+              }
+            }
           }
         },
         "construct.project": {
@@ -1215,6 +2622,54 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "将三维实体投影为二维草图",
+            "requiredParams": [
+              "source"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+              "axis": "enum，只能是 x、y、z。 坐标轴，只能是 x / y / z。 默认值 \"z\"。",
+              "mode": "enum，可选值：orthographic / section。 投影模式。 默认值 \"orthographic\"。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。"
+            ],
+            "whenNotToUse": [
+              "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+            ],
+            "commonMistakes": [
+              "把 2D 中间态当成最终实体结果。",
+              "对不稳定草图直接拉伸，导致后续布尔复杂度升高。"
+            ],
+            "recommendedBefore": [
+              "sketch.rectangle",
+              "sketch.circle",
+              "sketch.polygon",
+              "sketch.fromCurve"
+            ],
+            "recommendedAfter": [
+              "transform.translate",
+              "boolean.subtract",
+              "display.color"
+            ],
+            "stabilityNotes": [
+              "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom3。",
+            "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
+            "example": {
+              "id": "construct_project_example",
+              "action": "construct.project",
+              "params": {
+                "source": "body",
+                "axis": "z",
+                "mode": "orthographic"
+              }
+            }
           }
         },
         "construct.sectionByPlane": {
@@ -1238,6 +2693,64 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": false,
+            "summary": "按平面切出二维截面",
+            "requiredParams": [
+              "source",
+              "plane"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+              "plane": "plane，对象格式为 { origin, normal }。 平面对象，格式为 { origin, normal }。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。"
+            ],
+            "whenNotToUse": [
+              "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+            ],
+            "commonMistakes": [
+              "把 2D 中间态当成最终实体结果。",
+              "对不稳定草图直接拉伸，导致后续布尔复杂度升高。"
+            ],
+            "recommendedBefore": [
+              "sketch.rectangle",
+              "sketch.circle",
+              "sketch.polygon",
+              "sketch.fromCurve"
+            ],
+            "recommendedAfter": [
+              "transform.translate",
+              "boolean.subtract",
+              "display.color"
+            ],
+            "stabilityNotes": [
+              "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom3。",
+            "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
+            "example": {
+              "id": "construct_sectionByPlane_example",
+              "action": "construct.sectionByPlane",
+              "params": {
+                "source": "body",
+                "plane": {
+                  "origin": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "normal": [
+                    0,
+                    0,
+                    1
+                  ]
+                }
+              }
+            }
           }
         },
         "construct.cutByPlane": {
@@ -1269,8 +2782,79 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": false,
+            "summary": "按平面裁掉实体一侧",
+            "requiredParams": [
+              "source",
+              "plane",
+              "keep"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+              "plane": "plane，对象格式为 { origin, normal }。 平面对象，格式为 { origin, normal }。",
+              "keep": "enum，可选值：positive / negative。 裁切时保留平面正侧或负侧。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。"
+            ],
+            "whenNotToUse": [
+              "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+            ],
+            "commonMistakes": [
+              "把 2D 中间态当成最终实体结果。",
+              "对不稳定草图直接拉伸，导致后续布尔复杂度升高。"
+            ],
+            "recommendedBefore": [
+              "sketch.rectangle",
+              "sketch.circle",
+              "sketch.polygon",
+              "sketch.fromCurve"
+            ],
+            "recommendedAfter": [
+              "transform.translate",
+              "boolean.subtract",
+              "display.color"
+            ],
+            "stabilityNotes": [
+              "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom3。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "construct_cutByPlane_example",
+              "action": "construct.cutByPlane",
+              "params": {
+                "source": "body",
+                "plane": {
+                  "origin": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "normal": [
+                    0,
+                    0,
+                    1
+                  ]
+                },
+                "keep": "positive"
+              }
+            }
           }
         }
+      },
+      "llm": {
+        "purpose": "低维到高维、投影与裁切类 action 定义。",
+        "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+        "actionReadingOrder": [
+          "先看 summary 判断作用。",
+          "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+          "再按 requiredParams 与 paramGuide 填参数。",
+          "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+        ]
       }
     },
     "transforms": {
@@ -1280,7 +2864,7 @@
       "preservesTopology": true,
       "actions": {
         "transform.translate": {
-          "role": "平移几何",
+          "role": "按位移向量整体平移对象",
           "inputKinds": [
             "curve2",
             "geom2",
@@ -1303,10 +2887,61 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "按位移向量整体平移对象",
+            "requiredParams": [
+              "source",
+              "offset"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。要被整体移动的单个对象或分组。",
+              "offset": "vector3，长度为 3 的数值数组。相对位移向量，不是目标 center 坐标。"
+            },
+            "constraints": [
+              "offset 表示相对位移，不是对象最终中心点坐标。"
+            ],
+            "whenToUse": [
+              "对象已经建好，只需要整体移动到目标位置、边、面或装配位置时使用。",
+              "适合把单个孔、槽、凸台或零件定位到明确坐标。"
+            ],
+            "whenNotToUse": [
+              "不要把 offset 当成绝对中心点坐标；它表示相对位移。",
+              "不要把平移当成重复分布或对称复制；那更适合 pattern 或 mirror。"
+            ],
+            "commonMistakes": [
+              "把 offset 写成目标中心坐标，导致对象移动过头。",
+              "source 本身已经带偏移，又额外平移一次，导致布尔或装配错位。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "boolean.union",
+              "boolean.subtract",
+              "display.color",
+              "display.group"
+            ],
+            "stabilityNotes": [
+              "优先先在局部坐标里建出稳定对象，再通过 translate 放到目标位置。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+            "outputMeaning": "输出是整体平移后的对象，数量、拓扑和尺寸不变。",
+            "example": {
+              "id": "transform_translate_example",
+              "action": "transform.translate",
+              "params": {
+                "source": "body",
+                "offset": [
+                  10,
+                  0,
+                  0
+                ]
+              }
+            }
           }
         },
         "transform.rotate": {
-          "role": "按 XYZ 欧拉角旋转几何",
+          "role": "按 XYZ 欧拉角围绕指定原点旋转对象",
           "inputKinds": [
             "curve2",
             "geom2",
@@ -1337,10 +2972,68 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "按 XYZ 欧拉角围绕指定原点旋转对象",
+            "requiredParams": [
+              "source",
+              "angles"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。要被旋转的单个对象或分组。",
+              "angles": "vector3，长度为 3 的数值数组。XYZ 欧拉角，单位为度，不是弧度。",
+              "origin": "vector3，长度为 3 的数值数组。旋转基点；省略时绕世界原点 [0, 0, 0] 旋转。"
+            },
+            "constraints": [
+              "angles 的单位是度。",
+              "origin 省略时默认使用世界原点 [0, 0, 0]。"
+            ],
+            "whenToUse": [
+              "需要改变对象朝向，或绕某个基点翻转、摆正到另一面时使用。",
+              "适合把已建好的局部特征旋到正确方向后再参与布尔或装配。"
+            ],
+            "whenNotToUse": [
+              "不要把 rotate 当成圆周复制；需要多个副本时更适合 pattern.radial。",
+              "不要忽略 origin；默认是世界原点，不是对象自身中心。"
+            ],
+            "commonMistakes": [
+              "把 angles 当成弧度填写。",
+              "未设置合适的 origin，导致对象围绕错误中心转走。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "boolean.union",
+              "boolean.subtract",
+              "display.color",
+              "display.group"
+            ],
+            "stabilityNotes": [
+              "先确定局部对象与旋转基点，再做 rotate，通常比在多个坐标系里硬算顶点更稳。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+            "outputMeaning": "输出是围绕指定原点旋转后的对象，数量与尺寸不变，但空间朝向改变。",
+            "example": {
+              "id": "transform_rotate_example",
+              "action": "transform.rotate",
+              "params": {
+                "source": "body",
+                "angles": [
+                  0,
+                  0,
+                  90
+                ],
+                "origin": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
           }
         },
         "transform.scale": {
-          "role": "按轴缩放几何",
+          "role": "按轴围绕指定原点缩放对象",
           "inputKinds": [
             "curve2",
             "geom2",
@@ -1371,10 +3064,68 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "按轴围绕指定原点缩放对象",
+            "requiredParams": [
+              "source",
+              "factors"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。要被缩放的单个对象或分组。",
+              "factors": "vector3，长度为 3 的数值数组。按 x/y/z 轴的缩放倍数；1 表示该轴不变。",
+              "origin": "vector3，长度为 3 的数值数组。缩放基点；省略时绕世界原点 [0, 0, 0] 缩放。"
+            },
+            "constraints": [
+              "factors 表示缩放倍数，不是目标尺寸。",
+              "origin 省略时默认使用世界原点 [0, 0, 0]。"
+            ],
+            "whenToUse": [
+              "需要整体放大、压扁或沿某一轴拉伸既有对象时使用。",
+              "适合派生相似变体，或在局部基准下统一调整比例。"
+            ],
+            "whenNotToUse": [
+              "不要用 scale 代替本应直接写进 primitive 或 construct 的精确尺寸。",
+              "不要忽略 origin；围绕错误基点缩放会同时把对象位置拉走。"
+            ],
+            "commonMistakes": [
+              "把 factors 当成最终尺寸而不是缩放倍数。",
+              "围绕错误 origin 缩放，导致位置与尺寸同时出错。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "boolean.union",
+              "boolean.subtract",
+              "display.color",
+              "display.group"
+            ],
+            "stabilityNotes": [
+              "精确工程尺寸优先直接建模，scale 更适合派生和整体调整。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+            "outputMeaning": "输出是围绕指定原点缩放后的对象，拓扑保持，但尺寸和位置可能同时改变。",
+            "example": {
+              "id": "transform_scale_example",
+              "action": "transform.scale",
+              "params": {
+                "source": "body",
+                "factors": [
+                  1,
+                  1,
+                  1
+                ],
+                "origin": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
           }
         },
         "transform.mirror": {
-          "role": "按法向定义的镜像平面做镜像",
+          "role": "按镜像平面生成对称副本",
           "inputKinds": [
             "curve2",
             "geom2",
@@ -1397,10 +3148,67 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "按镜像平面生成对称副本",
+            "requiredParams": [
+              "source",
+              "plane"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。要生成对称副本的单个对象或分组。",
+              "plane": "plane，对象格式为 { origin, normal }。镜像平面上的一点与其法向量，共同定义镜像基准。"
+            },
+            "constraints": [
+              "plane.origin 是镜像平面上的一点，不是结果对象的新中心点。"
+            ],
+            "whenToUse": [
+              "需要得到相对某个平面的对侧对称副本时使用。",
+              "适合左右、上下、前后对称的孔位、凸台、耳板和半边结构。"
+            ],
+            "whenNotToUse": [
+              "不要把 mirror 当成普通平移；镜像会翻转到平面另一侧。",
+              "不要用它表达圆周重复或线性重复；那更适合 radial 或 linear。"
+            ],
+            "commonMistakes": [
+              "把 plane.origin 当成新中心点，而不是镜像平面上的一点。",
+              "plane.normal 方向写错，导致镜像平面选错轴向。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "boolean.union",
+              "display.group",
+              "display.color"
+            ],
+            "stabilityNotes": [
+              "对称结构优先先建半边或一侧特征，再 mirror，通常比手写两份更稳。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+            "outputMeaning": "输出是 source 关于该平面的镜像副本，数量不变、朝向翻转。",
+            "example": {
+              "id": "transform_mirror_example",
+              "action": "transform.mirror",
+              "params": {
+                "source": "body",
+                "plane": {
+                  "origin": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "normal": [
+                    1,
+                    0,
+                    0
+                  ]
+                }
+              }
+            }
           }
         },
         "transform.matrix": {
-          "role": "应用 4x4 变换矩阵，作为通用兜底变换",
+          "role": "应用 4x4 变换矩阵",
           "inputKinds": [
             "curve2",
             "geom2",
@@ -1423,8 +3231,88 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "应用 4x4 变换矩阵",
+            "requiredParams": [
+              "source",
+              "matrix"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。要施加通用矩阵变换的单个对象或分组。",
+              "matrix": "matrix4x4，4x4 数值矩阵。通用仿射变换矩阵，通常只在其他 transform 无法清晰表达时使用。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "当 translate、rotate、scale、mirror 都不能直接表达所需变换时使用。",
+              "需要对接外部求得的矩阵或做兜底变换时使用。"
+            ],
+            "whenNotToUse": [
+              "能用更具体的 transform 时不要优先用 matrix。",
+              "不要在不清楚矩阵含义时盲填数值。"
+            ],
+            "commonMistakes": [
+              "矩阵元素顺序理解错误，导致平移、旋转、缩放混在一起。",
+              "本可用 translate/rotate/scale 清晰表达，却改用 matrix 降低可读性。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "boolean.union",
+              "boolean.subtract",
+              "display.color",
+              "display.group"
+            ],
+            "stabilityNotes": [
+              "matrix 是兜底能力，优先保持 action 序列可解释。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+            "outputMeaning": "输出是施加矩阵后的对象，几何关系由矩阵决定，可读性低于专用 transform。",
+            "example": {
+              "id": "transform_matrix_example",
+              "action": "transform.matrix",
+              "params": {
+                "source": "body",
+                "matrix": [
+                  [
+                    1,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            }
           }
         }
+      },
+      "llm": {
+        "purpose": "空间变换类 action 定义。",
+        "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+        "actionReadingOrder": [
+          "先看 summary 判断作用。",
+          "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+          "再按 requiredParams 与 paramGuide 填参数。",
+          "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+        ]
       }
     },
     "booleans": {
@@ -1433,7 +3321,7 @@
       "category": "booleans",
       "actions": {
         "boolean.union": {
-          "role": "并集组合多个同维几何",
+          "role": "把多个同维对象合并成一个连续几何",
           "inputKinds": [
             "geom2",
             "geom3",
@@ -1451,6 +3339,56 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "把多个同维对象合并成一个连续几何",
+            "requiredParams": [
+              "sources"
+            ],
+            "paramGuide": {
+              "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要把主体与新增特征并成一个几何体时使用。",
+              "适合把本应连成一体的对象合成为单个结果。"
+            ],
+            "whenNotToUse": [
+              "不要仅仅为了把多个独立零件一起显示而使用 union；那更适合 display.group。",
+              "不要在对象关系还没定位清楚时盲目 union。"
+            ],
+            "commonMistakes": [
+              "希望保留独立零件，却误用了 union 导致它们变成一个体。",
+              "输入对象维度不一致。",
+              "本来只想逻辑分组预览，却把 union 当成 group。"
+            ],
+            "recommendedBefore": [
+              "solid.box",
+              "construct.extrudeLinear",
+              "transform.translate",
+              "pattern.grid"
+            ],
+            "recommendedAfter": [
+              "display.color",
+              "modify.generalize",
+              "transform.translate"
+            ],
+            "stabilityNotes": [
+              "union 适合在定位完成后把新增特征并入主体，不要让它承担全部结构组织责任。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
+            "outputMeaning": "输出是单一几何结果，sources 不再彼此独立。",
+            "example": {
+              "id": "boolean_union_example",
+              "action": "boolean.union",
+              "params": {
+                "sources": [
+                  "part_a",
+                  "part_b"
+                ]
+              }
+            }
           }
         },
         "boolean.subtract": {
@@ -1476,10 +3414,66 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "从基体中减去一个或多个工具体",
+            "requiredParams": [
+              "base",
+              "tools"
+            ],
+            "paramGuide": {
+              "base": "ref，字符串，引用前序 action 的 id。 减法基体引用。",
+              "tools": "ref[]，字符串数组，引用多个前序 action 的 id。 减法工具体引用数组。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "适合明确的开孔、开窗、开槽、型腔去料或从 base 中减去清晰特征。",
+              "主体和工具体都已独立建好、且几何关系明确后再使用。"
+            ],
+            "whenNotToUse": [
+              "不要把 subtract 当成生成复杂结构的唯一手段。",
+              "不要在对象仍然语义混乱时连续叠加多层 subtract。",
+              "不要把它当成逻辑分组或输出组织方式。"
+            ],
+            "commonMistakes": [
+              "tools 与 base 几乎不相交或只贴边，导致结果异常或不稳定。",
+              "base 仍是 2D 草图却被当成最终 3D 结果理解。",
+              "tools 数量很大时仍直接一次性减去全部阵列实例。"
+            ],
+            "recommendedBefore": [
+              "solid.box",
+              "construct.extrudeLinear",
+              "transform.translate",
+              "pattern.grid",
+              "pattern.linear"
+            ],
+            "recommendedAfter": [
+              "display.color",
+              "modify.generalize",
+              "transform.translate"
+            ],
+            "stabilityNotes": [
+              "优先先得到清晰 base，再用较少且明确的 tools/sources 做布尔。",
+              "布尔适合孔槽、拼接去料、实体拼合，不适合承担全部结构生成责任。",
+              "如果 tools 来自大阵列，先确保阵列范围、间距和作用区域是可控的。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
+            "outputMeaning": "输出是 base 去掉 tools 后的单一几何，维度跟随 base。",
+            "example": {
+              "id": "boolean_subtract_example",
+              "action": "boolean.subtract",
+              "params": {
+                "base": "base_body",
+                "tools": [
+                  "tool_body"
+                ]
+              }
+            }
           }
         },
         "boolean.intersect": {
-          "role": "求多个同维几何的交集",
+          "role": "只保留多个同维对象的重叠部分",
           "inputKinds": [
             "geom2",
             "geom3",
@@ -1497,8 +3491,68 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "只保留多个同维对象的重叠部分",
+            "requiredParams": [
+              "sources"
+            ],
+            "paramGuide": {
+              "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要用包围体、遮罩体或裁剪体截取主体有效区域时使用。",
+              "适合分件裁切、区域截取、把阵列限制在某个有效范围内。"
+            ],
+            "whenNotToUse": [
+              "不要把 intersect 当成并集或普通分组。",
+              "不要期望它保留非重叠部分；非重叠部分会全部消失。"
+            ],
+            "commonMistakes": [
+              "误以为 intersect 会得到两个对象的总外形。",
+              "sources 几乎不相交，结果接近空集。",
+              "输入对象维度不一致。"
+            ],
+            "recommendedBefore": [
+              "solid.box",
+              "construct.extrudeLinear",
+              "transform.translate",
+              "pattern.grid"
+            ],
+            "recommendedAfter": [
+              "display.color",
+              "modify.generalize",
+              "transform.translate"
+            ],
+            "stabilityNotes": [
+              "intersect 最适合用清晰的遮罩体裁剪目标区域，先确认重叠范围再使用。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
+            "outputMeaning": "输出只包含所有 sources 共同重叠的那一部分几何。",
+            "example": {
+              "id": "boolean_intersect_example",
+              "action": "boolean.intersect",
+              "params": {
+                "sources": [
+                  "part_a",
+                  "part_b"
+                ]
+              }
+            }
           }
         }
+      },
+      "llm": {
+        "purpose": "布尔运算类 action 定义。",
+        "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+        "actionReadingOrder": [
+          "先看 summary 判断作用。",
+          "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+          "再按 requiredParams 与 paramGuide 填参数。",
+          "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+        ]
       }
     },
     "modifiers": {
@@ -1530,10 +3584,60 @@
                 "default": "round"
               },
               "segments": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 32,
+                "minimum": 4
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "对二维草图做偏移，适合壁厚、轮廓扩边",
+            "requiredParams": [
+              "source",
+              "distance"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+              "distance": "number，数值，或 {\"$var\":\"变量名\"}。 二维偏移距离。",
+              "corners": "enum，可选值为 round / chamfer / edge。 角处理方式。 默认值 \"round\"。",
+              "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
+            },
+            "constraints": [
+              "segments 省略时默认使用 32。",
+              "segments 若填写，必须大于等于 4。"
+            ],
+            "whenToUse": [
+              "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
+            ],
+            "whenNotToUse": [
+              "不要用 modify 去掩盖前序草图或实体建模策略错误。"
+            ],
+            "commonMistakes": [
+              "把 offset/expand 的结果当作严格尺寸控制而忽略边角变化。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "construct.extrudeLinear",
+              "boolean.subtract",
+              "display.color"
+            ],
+            "stabilityNotes": [
+              "modify 更适合作为精修或派生步骤，而不是主建模骨架。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom2。",
+            "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
+            "example": {
+              "id": "modify_offset2d_example",
+              "action": "modify.offset2d",
+              "params": {
+                "source": "profile",
+                "distance": 2,
+                "corners": "round",
+                "segments": 32
+              }
+            }
           }
         },
         "modify.expand2d": {
@@ -1560,10 +3664,60 @@
                 "default": "round"
               },
               "segments": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 32,
+                "minimum": 4
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "对二维草图做实体化膨胀",
+            "requiredParams": [
+              "source",
+              "delta"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+              "delta": "number，数值，或 {\"$var\":\"变量名\"}。 扩张或收缩距离。",
+              "corners": "enum，可选值为 round / chamfer / edge。 角处理方式。 默认值 \"round\"。",
+              "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
+            },
+            "constraints": [
+              "segments 省略时默认使用 32。",
+              "segments 若填写，必须大于等于 4。"
+            ],
+            "whenToUse": [
+              "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
+            ],
+            "whenNotToUse": [
+              "不要用 modify 去掩盖前序草图或实体建模策略错误。"
+            ],
+            "commonMistakes": [
+              "把 offset/expand 的结果当作严格尺寸控制而忽略边角变化。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "construct.extrudeLinear",
+              "boolean.subtract",
+              "display.color"
+            ],
+            "stabilityNotes": [
+              "modify 更适合作为精修或派生步骤，而不是主建模骨架。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom2。",
+            "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
+            "example": {
+              "id": "modify_expand2d_example",
+              "action": "modify.expand2d",
+              "params": {
+                "source": "profile",
+                "delta": 2,
+                "corners": "round",
+                "segments": 32
+              }
+            }
           }
         },
         "modify.expand3d": {
@@ -1590,10 +3744,60 @@
                 "default": "round"
               },
               "segments": {
-                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+                "default": 32,
+                "minimum": 4
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "对三维实体做外扩或内缩",
+            "requiredParams": [
+              "source",
+              "delta"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+              "delta": "number，数值，或 {\"$var\":\"变量名\"}。 扩张或收缩距离。",
+              "corners": "enum，可选值为 round / chamfer / edge。 角处理方式。 默认值 \"round\"。",
+              "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
+            },
+            "constraints": [
+              "segments 省略时默认使用 32。",
+              "segments 若填写，必须大于等于 4。"
+            ],
+            "whenToUse": [
+              "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
+            ],
+            "whenNotToUse": [
+              "不要用 modify 去掩盖前序草图或实体建模策略错误。"
+            ],
+            "commonMistakes": [
+              "把 offset/expand 的结果当作严格尺寸控制而忽略边角变化。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "construct.extrudeLinear",
+              "boolean.subtract",
+              "display.color"
+            ],
+            "stabilityNotes": [
+              "modify 更适合作为精修或派生步骤，而不是主建模骨架。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom3。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "example": {
+              "id": "modify_expand3d_example",
+              "action": "modify.expand3d",
+              "params": {
+                "source": "body",
+                "delta": 2,
+                "corners": "round",
+                "segments": 32
+              }
+            }
           }
         },
         "modify.hull": {
@@ -1615,6 +3819,47 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "对多个对象求凸包",
+            "requiredParams": [
+              "sources"
+            ],
+            "paramGuide": {
+              "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
+            ],
+            "whenNotToUse": [
+              "不要用 modify 去掩盖前序草图或实体建模策略错误。"
+            ],
+            "commonMistakes": [
+              "把 offset/expand 的结果当作严格尺寸控制而忽略边角变化。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "construct.extrudeLinear",
+              "boolean.subtract",
+              "display.color"
+            ],
+            "stabilityNotes": [
+              "modify 更适合作为精修或派生步骤，而不是主建模骨架。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
+            "outputMeaning": "输出类型为 same-dimension，需结合上下文理解后续用法。",
+            "example": {
+              "id": "modify_hull_example",
+              "action": "modify.hull",
+              "params": {
+                "sources": [
+                  "part_a",
+                  "part_b"
+                ]
+              }
+            }
           }
         },
         "modify.hullChain": {
@@ -1636,6 +3881,48 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "按顺序对对象链逐段求凸包并合并",
+            "requiredParams": [
+              "sources"
+            ],
+            "paramGuide": {
+              "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
+            ],
+            "whenNotToUse": [
+              "不要用 modify 去掩盖前序草图或实体建模策略错误。"
+            ],
+            "commonMistakes": [
+              "把 offset/expand 的结果当作严格尺寸控制而忽略边角变化。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "construct.extrudeLinear",
+              "boolean.subtract",
+              "display.color"
+            ],
+            "stabilityNotes": [
+              "modify 更适合作为精修或派生步骤，而不是主建模骨架。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
+            "outputMeaning": "输出类型为 same-dimension，需结合上下文理解后续用法。",
+            "example": {
+              "id": "modify_hullChain_example",
+              "action": "modify.hullChain",
+              "params": {
+                "sources": [
+                  "part_a",
+                  "part_b",
+                  "part_c"
+                ]
+              }
+            }
           }
         },
         "modify.generalize": {
@@ -1668,8 +3955,62 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "几何清理与简化，去除冗余点、退化边和近重复面",
+            "requiredParams": [
+              "source"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+              "snap": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否吸附近邻点，减少几何噪声。 默认值 true。",
+              "simplify": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否做几何简化。 默认值 false。",
+              "triangulate": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 是否三角化输出网格。 默认值 false。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
+            ],
+            "whenNotToUse": [
+              "不要用 modify 去掩盖前序草图或实体建模策略错误。"
+            ],
+            "commonMistakes": [
+              "把 offset/expand 的结果当作严格尺寸控制而忽略边角变化。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "construct.extrudeLinear",
+              "boolean.subtract",
+              "display.color"
+            ],
+            "stabilityNotes": [
+              "modify 更适合作为精修或派生步骤，而不是主建模骨架。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3。",
+            "outputMeaning": "输出类型为 same-as-source，需结合上下文理解后续用法。",
+            "example": {
+              "id": "modify_generalize_example",
+              "action": "modify.generalize",
+              "params": {
+                "source": "body",
+                "snap": true,
+                "simplify": false,
+                "triangulate": false
+              }
+            }
           }
         }
+      },
+      "llm": {
+        "purpose": "偏移、扩张、凸包、清理类 action 定义。",
+        "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+        "actionReadingOrder": [
+          "先看 summary 判断作用。",
+          "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+          "再按 requiredParams 与 paramGuide 填参数。",
+          "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+        ]
       }
     },
     "patterns": {
@@ -1713,6 +4054,68 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "按单方向线性阵列复制对象",
+            "requiredParams": [
+              "source",
+              "count",
+              "step"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。要被重复的基础对象或分组。",
+              "count": "integer，整数，或 {\"$var\":\"变量名\"}。线性阵列的总实例数，必须是整数。",
+              "step": "vector3，长度为 3 的数值数组。相邻两个实例之间的位移步长。",
+              "origin": "vector3，长度为 3 的数值数组。首个实例的附加偏移，不是整组中心点。 默认值 [0, 0, 0]。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要沿单一方向、同一条边或同一直线重复特征时使用。",
+              "适合同边的多个孔、凸耳、肋、安装位或等距单元。"
+            ],
+            "whenNotToUse": [
+              "不要用 linear 表达二维网格；那更适合 pattern.grid。",
+              "不要用 linear 表达对边对称副本；那更适合 transform.mirror。"
+            ],
+            "commonMistakes": [
+              "把 count 理解成额外副本数量，而不是总实例数。",
+              "把 origin 当成整组中心，导致阵列整体偏移。"
+            ],
+            "recommendedBefore": [
+              "solid.cylinder",
+              "sketch.circle",
+              "transform.translate"
+            ],
+            "recommendedAfter": [
+              "boolean.union",
+              "boolean.subtract",
+              "transform.mirror",
+              "display.group"
+            ],
+            "stabilityNotes": [
+              "linear 更适合先把单个特征定义清楚，再沿一个方向复制，不要同时承担定位和裁边。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+            "outputMeaning": "输出是 group，按 step 从 origin 开始线性排列 count 个实例。",
+            "example": {
+              "id": "pattern_linear_example",
+              "action": "pattern.linear",
+              "params": {
+                "source": "unit",
+                "count": 4,
+                "step": [
+                  20,
+                  0,
+                  0
+                ],
+                "origin": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
           }
         },
         "pattern.grid": {
@@ -1756,6 +4159,72 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "按三轴网格阵列复制对象",
+            "requiredParams": [
+              "source",
+              "count",
+              "step"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。要被重复的基础对象或分组。",
+              "count": "array，固定长度 3。分别表示 x/y/z 三个方向上的总实例数，必须写成 [nx, ny, nz]。",
+              "step": "vector3，长度为 3 的数值数组。x/y/z 三个方向上相邻实例的步长。",
+              "origin": "vector3，长度为 3 的数值数组。首个实例的附加偏移，不是整个网格中心。 默认值 [0, 0, 0]。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要在平面或体积中按行列/层规则重复单元时使用。",
+              "适合孔阵、格栅、规则分布的加强特征和重复单元。"
+            ],
+            "whenNotToUse": [
+              "不要用 grid 表达单边一列重复；那更适合 pattern.linear。",
+              "不要假设 grid 自带裁边或保留外框；它只负责复制。"
+            ],
+            "commonMistakes": [
+              "把 count 写成单个数，而不是 [x, y, z]。",
+              "把 origin 当成整个网格中心，导致阵列落位错误。",
+              "count 很大却没有控制边界，导致后续布尔或预览复杂度暴涨。"
+            ],
+            "recommendedBefore": [
+              "solid.cylinder",
+              "sketch.circle",
+              "transform.translate"
+            ],
+            "recommendedAfter": [
+              "boolean.subtract",
+              "boolean.intersect",
+              "display.group"
+            ],
+            "stabilityNotes": [
+              "grid 适合先生成规则单元集合，再由其他 action 决定是否裁边或参与布尔。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+            "outputMeaning": "输出是 group，实例沿 x/y/z 方向形成规则网格排列。",
+            "example": {
+              "id": "pattern_grid_example",
+              "action": "pattern.grid",
+              "params": {
+                "source": "unit",
+                "count": [
+                  2,
+                  2,
+                  1
+                ],
+                "step": [
+                  20,
+                  20,
+                  0
+                ],
+                "origin": [
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
           }
         },
         "pattern.radial": {
@@ -1810,8 +4279,84 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "按圆周阵列复制对象",
+            "requiredParams": [
+              "source",
+              "count",
+              "radius"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。要被绕轴复制的基础对象或分组。",
+              "count": "integer，整数，或 {\"$var\":\"变量名\"}。圆周上的总实例数。",
+              "radius": "number，数值，或 {\"$var\":\"变量名\"}。阵列半径；若为 0，实例会重叠在轴心附近。",
+              "startAngle": "number，数值，或 {\"$var\":\"变量名\"}。起始角度，单位为度。 默认值 0。",
+              "sweepAngle": "number，数值，或 {\"$var\":\"变量名\"}。沿圆周分布的总扫掠角度，单位为度。 默认值 360。",
+              "axis": "enum，只能是 x、y、z。 阵列围绕的坐标轴。 默认值 \"z\"。",
+              "center": "vector3，长度为 3 的数值数组。阵列圆心坐标。 默认值 [0, 0, 0]。",
+              "rotateItems": "boolean，布尔值，或 {\"$var\":\"变量名\"}。每个副本是否随圆周方向同步旋转。 默认值 true。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要围绕某个中心轴做圆周均布时使用。",
+              "适合法兰孔、叶片、轮辐、圆周耳位等环形重复特征。"
+            ],
+            "whenNotToUse": [
+              "不要用 radial 表达对边或左右两侧分布；那更适合 mirror 或 linear。",
+              "不要把 radius 设为 0 只为了复制对象；这通常会导致实例重叠。"
+            ],
+            "commonMistakes": [
+              "把 radial 当成普通对称复制，结果特征跑到不该去的方位。",
+              "radius 为 0 或 center/axis 设错，导致实例重叠或转轴错误。",
+              "未判断 rotateItems 是否需要开启，导致副本朝向不符合预期。"
+            ],
+            "recommendedBefore": [
+              "solid.cylinder",
+              "sketch.circle",
+              "transform.translate"
+            ],
+            "recommendedAfter": [
+              "boolean.union",
+              "boolean.subtract",
+              "display.group"
+            ],
+            "stabilityNotes": [
+              "只有当特征确实围绕同一轴心重复时再用 radial；少量对称特征通常更适合 mirror。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+            "outputMeaning": "输出是 group，实例分布在指定 axis 的圆周上，可选是否随角度同步旋转。",
+            "example": {
+              "id": "pattern_radial_example",
+              "action": "pattern.radial",
+              "params": {
+                "source": "unit",
+                "count": 6,
+                "radius": 30,
+                "startAngle": 0,
+                "sweepAngle": 360,
+                "axis": "z",
+                "center": [
+                  0,
+                  0,
+                  0
+                ],
+                "rotateItems": true
+              }
+            }
           }
         }
+      },
+      "llm": {
+        "purpose": "阵列复制类 action 定义。",
+        "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+        "actionReadingOrder": [
+          "先看 summary 判断作用。",
+          "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+          "再按 requiredParams 与 paramGuide 填参数。",
+          "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+        ]
       }
     },
     "display": {
@@ -1842,6 +4387,53 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "给几何附加预览颜色，不改变几何本体",
+            "requiredParams": [
+              "source",
+              "rgba"
+            ],
+            "paramGuide": {
+              "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
+              "rgba": "rgba，长度为 4 的颜色数组，范围 0 到 1。 颜色数组，格式为 [r, g, b, a]，范围 0 到 1。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要在不改变几何的情况下区分零件、阶段结果或最终预览颜色时使用。"
+            ],
+            "whenNotToUse": [
+              "不要把 color 当成材质仿真或几何修改。"
+            ],
+            "commonMistakes": [
+              "把 alpha 设得过低，误以为实体缺面或消失。",
+              "把 display.color 当成会改变几何尺寸或实体结构。"
+            ],
+            "recommendedBefore": [
+              "boolean.union",
+              "boolean.subtract",
+              "construct.extrudeLinear"
+            ],
+            "recommendedAfter": [],
+            "stabilityNotes": [
+              "display 应放在建模链路末尾，保持与几何生成解耦。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
+            "outputMeaning": "输出类型为 same-as-source，需结合上下文理解后续用法。",
+            "example": {
+              "id": "display_color_example",
+              "action": "display.color",
+              "params": {
+                "source": "body",
+                "rgba": [
+                  0.2,
+                  0.4,
+                  0.9,
+                  1
+                ]
+              }
+            }
           }
         },
         "display.group": {
@@ -1864,8 +4456,63 @@
               }
             },
             "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "把多个对象组织成一个逻辑输出组",
+            "requiredParams": [
+              "sources"
+            ],
+            "paramGuide": {
+              "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
+            },
+            "constraints": [],
+            "whenToUse": [
+              "需要同时输出多个彼此独立的零件、装配件或炸开视图时使用。",
+              "适合保持零件独立，同时一起预览、导出或着色。"
+            ],
+            "whenNotToUse": [
+              "如果目标是一个连成一体的实体，不要用 group；应使用 boolean.union。",
+              "不要把 group 当成几何运算。"
+            ],
+            "commonMistakes": [
+              "把希望打印或使用成一体的零件放进 group，却没有 union。",
+              "把 group 后的多个零件误当成单一 geom3 理解。"
+            ],
+            "recommendedBefore": [
+              "display.color",
+              "transform.translate",
+              "boolean.union",
+              "boolean.subtract"
+            ],
+            "recommendedAfter": [],
+            "stabilityNotes": [
+              "group 适合结果组织，不改变几何关系；独立零件尽量在末尾再 group。"
+            ],
+            "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
+            "outputMeaning": "逻辑输出组，用于一起预览、导出或表达多个独立结果，并不会执行几何并集。",
+            "example": {
+              "id": "display_group_example",
+              "action": "display.group",
+              "params": {
+                "sources": [
+                  "part_a",
+                  "part_b"
+                ]
+              }
+            }
           }
         }
+      },
+      "llm": {
+        "purpose": "显示与逻辑分组类 action 定义。",
+        "readAs": "这份 JSON 可以直接提供给大模型阅读；优先看每个 action 下的 llm 字段，再遵守 paramsSchema。",
+        "actionReadingOrder": [
+          "先看 summary 判断作用。",
+          "再看 whenToUse / whenNotToUse / commonMistakes 选择是否使用。",
+          "再按 requiredParams 与 paramGuide 填参数。",
+          "最后参考 recommendedBefore / recommendedAfter / stabilityNotes 组织 action 顺序。"
+        ]
       }
     }
   }

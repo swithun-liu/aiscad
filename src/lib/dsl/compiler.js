@@ -101,6 +101,10 @@ function toRadians(values) {
   return values.map((value) => degToRad(value))
 }
 
+function normalizedSegments(value, fallback = 32) {
+  return Math.max(4, value ?? fallback)
+}
+
 function wrapRecord(kind, value, color = null) {
   return { kind, value, color }
 }
@@ -158,6 +162,20 @@ function applyTransformToRecord(record, transformFn) {
   return mapRecord(record, (leaf) => wrapRecord(leaf.kind, transformFn(leaf.value), leaf.color))
 }
 
+function applyTransformAroundOrigin(geometry, origin, transformFn) {
+  const pivot = origin || [0, 0, 0]
+  const hasPivotOffset = pivot.some((value) => value !== 0)
+  let next = geometry
+  if (hasPivotOffset) {
+    next = transforms.translate(pivot.map((value) => -value), next)
+  }
+  next = transformFn(next)
+  if (hasPivotOffset) {
+    next = transforms.translate(pivot, next)
+  }
+  return next
+}
+
 function mergeColors(records) {
   return records.find((record) => record.color)?.color || null
 }
@@ -208,12 +226,21 @@ function compileCurveLine(params) {
 }
 
 function compileCurveArc(params) {
-  return wrapRecord('curve2', primitives.arc(params))
+  return wrapRecord('curve2', primitives.arc({
+    center: params.center,
+    radius: params.radius,
+    startAngle: params.startAngle,
+    endAngle: params.endAngle,
+    segments: normalizedSegments(params.segments),
+  }))
 }
 
 function compileCurveBezier(params) {
   const base = path2.create([[0, 0]])
-  const curve = path2.appendBezier({ controlPoints: params.controlPoints, segments: params.segments || 32 }, base)
+  const curve = path2.appendBezier({
+    controlPoints: params.controlPoints,
+    segments: normalizedSegments(params.segments),
+  }, base)
   return wrapRecord('curve2', curve)
 }
 
@@ -254,9 +281,17 @@ function compileAction(node, state) {
     case 'curve.close':
       return compileCurveClose(params, state)
     case 'sketch.circle':
-      return wrapRecord('geom2', primitives.circle(params))
+      return wrapRecord('geom2', primitives.circle({
+        radius: params.radius,
+        center: params.center,
+        segments: normalizedSegments(params.segments),
+      }))
     case 'sketch.ellipse':
-      return wrapRecord('geom2', primitives.ellipse(params))
+      return wrapRecord('geom2', primitives.ellipse({
+        radius: params.radius,
+        center: params.center,
+        segments: normalizedSegments(params.segments),
+      }))
     case 'sketch.rectangle':
       return wrapRecord('geom2', primitives.rectangle(params))
     case 'sketch.roundedRectangle':
@@ -264,7 +299,7 @@ function compileAction(node, state) {
         size: params.size,
         center: params.center,
         roundRadius: params.radius,
-        segments: params.segments,
+        segments: normalizedSegments(params.segments),
       }))
     case 'sketch.polygon':
       return wrapRecord('geom2', primitives.polygon({ points: params.points }))
@@ -279,10 +314,14 @@ function compileAction(node, state) {
         size: params.size,
         center: params.center,
         roundRadius: params.radius,
-        segments: params.segments,
+        segments: normalizedSegments(params.segments),
       }))
     case 'solid.sphere':
-      return wrapRecord('geom3', primitives.sphere(params))
+      return wrapRecord('geom3', primitives.sphere({
+        radius: params.radius,
+        center: params.center,
+        segments: normalizedSegments(params.segments),
+      }))
     case 'solid.geodesicSphere':
       return wrapRecord('geom3', primitives.geodesicSphere({
         radius: params.radius,
@@ -291,14 +330,19 @@ function compileAction(node, state) {
       }))
     case 'solid.cylinder': {
       if (typeof params.radius === 'number') {
-        return wrapRecord('geom3', primitives.cylinder(params))
+        return wrapRecord('geom3', primitives.cylinder({
+          height: params.height,
+          radius: params.radius,
+          center: params.center,
+          segments: normalizedSegments(params.segments),
+        }))
       }
       return wrapRecord('geom3', primitives.cylinderElliptic({
         center: params.center,
         height: params.height,
         startRadius: [params.radiusBottom, params.radiusBottom],
         endRadius: [params.radiusTop, params.radiusTop],
-        segments: params.segments,
+        segments: normalizedSegments(params.segments),
       }))
     }
     case 'solid.ellipticalCylinder':
@@ -307,7 +351,7 @@ function compileAction(node, state) {
         height: params.height,
         startRadius: params.radiusBottom,
         endRadius: params.radiusTop,
-        segments: params.segments,
+        segments: normalizedSegments(params.segments),
       }))
     case 'solid.roundedCylinder':
       return wrapRecord('geom3', primitives.roundedCylinder({
@@ -315,7 +359,7 @@ function compileAction(node, state) {
         height: params.height,
         radius: params.radius,
         roundRadius: params.roundRadius,
-        segments: params.segments,
+        segments: normalizedSegments(params.segments),
       }))
     case 'solid.torus':
       return wrapRecord('geom3', primitives.torus({
@@ -342,7 +386,7 @@ function compileAction(node, state) {
       if (source.kind !== 'geom2') throw new Error('construct.extrudeRotate 只支持 geom2')
       return wrapRecord('geom3', extrusions.extrudeRotate({
         angle: degToRad(params.angle || 360),
-        segments: params.segments,
+        segments: normalizedSegments(params.segments),
       }, source.value), source.color)
     }
     case 'construct.extrudeRectangular': {
@@ -371,11 +415,19 @@ function compileAction(node, state) {
     case 'transform.rotate': {
       const source = requireRecord(params.source, state)
       const angles = toRadians(params.angles)
-      return applyTransformToRecord(source, (geometry) => transforms.rotate(angles, geometry))
+      return applyTransformToRecord(source, (geometry) => applyTransformAroundOrigin(
+        geometry,
+        params.origin,
+        (item) => transforms.rotate(angles, item),
+      ))
     }
     case 'transform.scale': {
       const source = requireRecord(params.source, state)
-      return applyTransformToRecord(source, (geometry) => transforms.scale(params.factors, geometry))
+      return applyTransformToRecord(source, (geometry) => applyTransformAroundOrigin(
+        geometry,
+        params.origin,
+        (item) => transforms.scale(params.factors, item),
+      ))
     }
     case 'transform.mirror': {
       const source = requireRecord(params.source, state)
@@ -403,7 +455,7 @@ function compileAction(node, state) {
       return wrapRecord('geom2', expansions.offset({
         delta: params.distance,
         corners: params.corners,
-        segments: params.segments,
+        segments: normalizedSegments(params.segments),
       }, source.value), source.color)
     }
     case 'modify.expand2d': {
@@ -412,7 +464,7 @@ function compileAction(node, state) {
       return wrapRecord('geom2', expansions.expand({
         delta: params.delta,
         corners: params.corners,
-        segments: params.segments,
+        segments: normalizedSegments(params.segments),
       }, source.value), source.color)
     }
     case 'modify.expand3d': {
@@ -421,7 +473,7 @@ function compileAction(node, state) {
       return wrapRecord('geom3', expansions.expand({
         delta: params.delta,
         corners: params.corners,
-        segments: params.segments,
+        segments: normalizedSegments(params.segments),
       }, source.value), source.color)
     }
     case 'modify.hull':

@@ -40,13 +40,13 @@
         },
         "constraints": [],
         "whenToUse": [
-          "需要组织预览结果、上色或输出逻辑分组时使用。"
+          "需要在不改变几何的情况下区分零件、阶段结果或最终预览颜色时使用。"
         ],
         "whenNotToUse": [
-          "不要把 display 当成生成几何的步骤。"
+          "不要把 color 当成材质仿真或几何修改。"
         ],
         "commonMistakes": [
-          "把 display.group 误以为会执行几何并集。",
+          "把 alpha 设得过低，误以为实体缺面或消失。",
           "把 display.color 当成会改变几何尺寸或实体结构。"
         ],
         "recommendedBefore": [
@@ -107,26 +107,29 @@
         },
         "constraints": [],
         "whenToUse": [
-          "需要组织预览结果、上色或输出逻辑分组时使用。"
+          "需要同时输出多个彼此独立的零件、装配件或炸开视图时使用。",
+          "适合保持零件独立，同时一起预览、导出或着色。"
         ],
         "whenNotToUse": [
-          "不要把 display 当成生成几何的步骤。"
+          "如果目标是一个连成一体的实体，不要用 group；应使用 boolean.union。",
+          "不要把 group 当成几何运算。"
         ],
         "commonMistakes": [
-          "把 display.group 误以为会执行几何并集。",
-          "把 display.color 当成会改变几何尺寸或实体结构。"
+          "把希望打印或使用成一体的零件放进 group，却没有 union。",
+          "把 group 后的多个零件误当成单一 geom3 理解。"
         ],
         "recommendedBefore": [
+          "display.color",
+          "transform.translate",
           "boolean.union",
-          "boolean.subtract",
-          "construct.extrudeLinear"
+          "boolean.subtract"
         ],
         "recommendedAfter": [],
         "stabilityNotes": [
-          "display 应放在建模链路末尾，保持与几何生成解耦。"
+          "group 适合结果组织，不改变几何关系；独立零件尽量在末尾再 group。"
         ],
         "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
-        "outputMeaning": "逻辑输出组，用于一起预览、导出或表达多个结果，并不会执行几何并集。",
+        "outputMeaning": "逻辑输出组，用于一起预览、导出或表达多个独立结果，并不会执行几何并集。",
         "example": {
           "id": "display_group_example",
           "action": "display.group",

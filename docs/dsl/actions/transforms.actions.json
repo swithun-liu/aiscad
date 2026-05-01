@@ -5,7 +5,7 @@
   "preservesTopology": true,
   "actions": {
     "transform.translate": {
-      "role": "平移几何",
+      "role": "按位移向量整体平移对象",
       "inputKinds": [
         "curve2",
         "geom2",
@@ -31,38 +31,42 @@
       },
       "llm": {
         "webSupported": true,
-        "summary": "平移几何",
+        "summary": "按位移向量整体平移对象",
         "requiredParams": [
           "source",
           "offset"
         ],
         "paramGuide": {
-          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
-          "offset": "vector3，长度为 3 的数值数组。 位移向量。"
+          "source": "ref，字符串，引用前序 action 的 id。要被整体移动的单个对象或分组。",
+          "offset": "vector3，长度为 3 的数值数组。相对位移向量，不是目标 center 坐标。"
         },
-        "constraints": [],
+        "constraints": [
+          "offset 表示相对位移，不是对象最终中心点坐标。"
+        ],
         "whenToUse": [
-          "需要在不改变几何本质的前提下调整位置、姿态或尺度时使用。"
+          "对象已经建好，只需要整体移动到目标位置、边、面或装配位置时使用。",
+          "适合把单个孔、槽、凸台或零件定位到明确坐标。"
         ],
         "whenNotToUse": [
-          "不要用 transform 代替本应在 primitive/construct 阶段直接表达的尺寸信息。"
+          "不要把 offset 当成绝对中心点坐标；它表示相对位移。",
+          "不要把平移当成重复分布或对称复制；那更适合 pattern 或 mirror。"
         ],
         "commonMistakes": [
-          "在阵列和布尔前忘记统一坐标基准，导致对象错位。"
+          "把 offset 写成目标中心坐标，导致对象移动过头。",
+          "source 本身已经带偏移，又额外平移一次，导致布尔或装配错位。"
         ],
         "recommendedBefore": [],
         "recommendedAfter": [
           "boolean.union",
           "boolean.subtract",
-          "pattern.linear",
-          "pattern.grid",
-          "pattern.radial"
+          "display.color",
+          "display.group"
         ],
         "stabilityNotes": [
-          "尽量先得到简单稳定的对象，再做 transform，而不是在草图阶段混入过多偏移。"
+          "优先先在局部坐标里建出稳定对象，再通过 translate 放到目标位置。"
         ],
         "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
-        "outputMeaning": "输出类型为 same-as-source，需结合上下文理解后续用法。",
+        "outputMeaning": "输出是整体平移后的对象，数量、拓扑和尺寸不变。",
         "example": {
           "id": "transform_translate_example",
           "action": "transform.translate",
@@ -78,7 +82,7 @@
       }
     },
     "transform.rotate": {
-      "role": "按 XYZ 欧拉角旋转几何",
+      "role": "按 XYZ 欧拉角围绕指定原点旋转对象",
       "inputKinds": [
         "curve2",
         "geom2",
@@ -112,39 +116,44 @@
       },
       "llm": {
         "webSupported": true,
-        "summary": "按 XYZ 欧拉角旋转几何",
+        "summary": "按 XYZ 欧拉角围绕指定原点旋转对象",
         "requiredParams": [
           "source",
           "angles"
         ],
         "paramGuide": {
-          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
-          "angles": "vector3，长度为 3 的数值数组。 XYZ 欧拉角，单位为度。",
-          "origin": "vector3，长度为 3 的数值数组。 阵列起始偏移。 默认值 [0, 0, 0]。"
+          "source": "ref，字符串，引用前序 action 的 id。要被旋转的单个对象或分组。",
+          "angles": "vector3，长度为 3 的数值数组。XYZ 欧拉角，单位为度，不是弧度。",
+          "origin": "vector3，长度为 3 的数值数组。旋转基点；省略时绕世界原点 [0, 0, 0] 旋转。"
         },
-        "constraints": [],
+        "constraints": [
+          "angles 的单位是度。",
+          "origin 省略时默认使用世界原点 [0, 0, 0]。"
+        ],
         "whenToUse": [
-          "需要在不改变几何本质的前提下调整位置、姿态或尺度时使用。"
+          "需要改变对象朝向，或绕某个基点翻转、摆正到另一面时使用。",
+          "适合把已建好的局部特征旋到正确方向后再参与布尔或装配。"
         ],
         "whenNotToUse": [
-          "不要用 transform 代替本应在 primitive/construct 阶段直接表达的尺寸信息。"
+          "不要把 rotate 当成圆周复制；需要多个副本时更适合 pattern.radial。",
+          "不要忽略 origin；默认是世界原点，不是对象自身中心。"
         ],
         "commonMistakes": [
-          "在阵列和布尔前忘记统一坐标基准，导致对象错位。"
+          "把 angles 当成弧度填写。",
+          "未设置合适的 origin，导致对象围绕错误中心转走。"
         ],
         "recommendedBefore": [],
         "recommendedAfter": [
           "boolean.union",
           "boolean.subtract",
-          "pattern.linear",
-          "pattern.grid",
-          "pattern.radial"
+          "display.color",
+          "display.group"
         ],
         "stabilityNotes": [
-          "尽量先得到简单稳定的对象，再做 transform，而不是在草图阶段混入过多偏移。"
+          "先确定局部对象与旋转基点，再做 rotate，通常比在多个坐标系里硬算顶点更稳。"
         ],
         "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
-        "outputMeaning": "输出类型为 same-as-source，需结合上下文理解后续用法。",
+        "outputMeaning": "输出是围绕指定原点旋转后的对象，数量与尺寸不变，但空间朝向改变。",
         "example": {
           "id": "transform_rotate_example",
           "action": "transform.rotate",
@@ -165,7 +174,7 @@
       }
     },
     "transform.scale": {
-      "role": "按轴缩放几何",
+      "role": "按轴围绕指定原点缩放对象",
       "inputKinds": [
         "curve2",
         "geom2",
@@ -199,39 +208,44 @@
       },
       "llm": {
         "webSupported": true,
-        "summary": "按轴缩放几何",
+        "summary": "按轴围绕指定原点缩放对象",
         "requiredParams": [
           "source",
           "factors"
         ],
         "paramGuide": {
-          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
-          "factors": "vector3，长度为 3 的数值数组。 按轴缩放倍数。",
-          "origin": "vector3，长度为 3 的数值数组。 阵列起始偏移。 默认值 [0, 0, 0]。"
+          "source": "ref，字符串，引用前序 action 的 id。要被缩放的单个对象或分组。",
+          "factors": "vector3，长度为 3 的数值数组。按 x/y/z 轴的缩放倍数；1 表示该轴不变。",
+          "origin": "vector3，长度为 3 的数值数组。缩放基点；省略时绕世界原点 [0, 0, 0] 缩放。"
         },
-        "constraints": [],
+        "constraints": [
+          "factors 表示缩放倍数，不是目标尺寸。",
+          "origin 省略时默认使用世界原点 [0, 0, 0]。"
+        ],
         "whenToUse": [
-          "需要在不改变几何本质的前提下调整位置、姿态或尺度时使用。"
+          "需要整体放大、压扁或沿某一轴拉伸既有对象时使用。",
+          "适合派生相似变体，或在局部基准下统一调整比例。"
         ],
         "whenNotToUse": [
-          "不要用 transform 代替本应在 primitive/construct 阶段直接表达的尺寸信息。"
+          "不要用 scale 代替本应直接写进 primitive 或 construct 的精确尺寸。",
+          "不要忽略 origin；围绕错误基点缩放会同时把对象位置拉走。"
         ],
         "commonMistakes": [
-          "在阵列和布尔前忘记统一坐标基准，导致对象错位。"
+          "把 factors 当成最终尺寸而不是缩放倍数。",
+          "围绕错误 origin 缩放，导致位置与尺寸同时出错。"
         ],
         "recommendedBefore": [],
         "recommendedAfter": [
           "boolean.union",
           "boolean.subtract",
-          "pattern.linear",
-          "pattern.grid",
-          "pattern.radial"
+          "display.color",
+          "display.group"
         ],
         "stabilityNotes": [
-          "尽量先得到简单稳定的对象，再做 transform，而不是在草图阶段混入过多偏移。"
+          "精确工程尺寸优先直接建模，scale 更适合派生和整体调整。"
         ],
         "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
-        "outputMeaning": "输出类型为 same-as-source，需结合上下文理解后续用法。",
+        "outputMeaning": "输出是围绕指定原点缩放后的对象，拓扑保持，但尺寸和位置可能同时改变。",
         "example": {
           "id": "transform_scale_example",
           "action": "transform.scale",
@@ -252,7 +266,7 @@
       }
     },
     "transform.mirror": {
-      "role": "按法向定义的镜像平面做镜像",
+      "role": "按镜像平面生成对称副本",
       "inputKinds": [
         "curve2",
         "geom2",
@@ -278,38 +292,41 @@
       },
       "llm": {
         "webSupported": true,
-        "summary": "按法向定义的镜像平面做镜像",
+        "summary": "按镜像平面生成对称副本",
         "requiredParams": [
           "source",
           "plane"
         ],
         "paramGuide": {
-          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
-          "plane": "plane，对象格式为 { origin, normal }。 平面对象，格式为 { origin, normal }。"
+          "source": "ref，字符串，引用前序 action 的 id。要生成对称副本的单个对象或分组。",
+          "plane": "plane，对象格式为 { origin, normal }。镜像平面上的一点与其法向量，共同定义镜像基准。"
         },
-        "constraints": [],
+        "constraints": [
+          "plane.origin 是镜像平面上的一点，不是结果对象的新中心点。"
+        ],
         "whenToUse": [
-          "需要在不改变几何本质的前提下调整位置、姿态或尺度时使用。"
+          "需要得到相对某个平面的对侧对称副本时使用。",
+          "适合左右、上下、前后对称的孔位、凸台、耳板和半边结构。"
         ],
         "whenNotToUse": [
-          "不要用 transform 代替本应在 primitive/construct 阶段直接表达的尺寸信息。"
+          "不要把 mirror 当成普通平移；镜像会翻转到平面另一侧。",
+          "不要用它表达圆周重复或线性重复；那更适合 radial 或 linear。"
         ],
         "commonMistakes": [
-          "在阵列和布尔前忘记统一坐标基准，导致对象错位。"
+          "把 plane.origin 当成新中心点，而不是镜像平面上的一点。",
+          "plane.normal 方向写错，导致镜像平面选错轴向。"
         ],
         "recommendedBefore": [],
         "recommendedAfter": [
           "boolean.union",
-          "boolean.subtract",
-          "pattern.linear",
-          "pattern.grid",
-          "pattern.radial"
+          "display.group",
+          "display.color"
         ],
         "stabilityNotes": [
-          "尽量先得到简单稳定的对象，再做 transform，而不是在草图阶段混入过多偏移。"
+          "对称结构优先先建半边或一侧特征，再 mirror，通常比手写两份更稳。"
         ],
         "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
-        "outputMeaning": "输出类型为 same-as-source，需结合上下文理解后续用法。",
+        "outputMeaning": "输出是 source 关于该平面的镜像副本，数量不变、朝向翻转。",
         "example": {
           "id": "transform_mirror_example",
           "action": "transform.mirror",
@@ -332,7 +349,7 @@
       }
     },
     "transform.matrix": {
-      "role": "应用 4x4 变换矩阵，作为通用兜底变换",
+      "role": "应用 4x4 变换矩阵",
       "inputKinds": [
         "curve2",
         "geom2",
@@ -358,38 +375,40 @@
       },
       "llm": {
         "webSupported": true,
-        "summary": "应用 4x4 变换矩阵，作为通用兜底变换",
+        "summary": "应用 4x4 变换矩阵",
         "requiredParams": [
           "source",
           "matrix"
         ],
         "paramGuide": {
-          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
-          "matrix": "matrix4x4，4x4 数值矩阵。 4x4 变换矩阵。"
+          "source": "ref，字符串，引用前序 action 的 id。要施加通用矩阵变换的单个对象或分组。",
+          "matrix": "matrix4x4，4x4 数值矩阵。通用仿射变换矩阵，通常只在其他 transform 无法清晰表达时使用。"
         },
         "constraints": [],
         "whenToUse": [
-          "需要在不改变几何本质的前提下调整位置、姿态或尺度时使用。"
+          "当 translate、rotate、scale、mirror 都不能直接表达所需变换时使用。",
+          "需要对接外部求得的矩阵或做兜底变换时使用。"
         ],
         "whenNotToUse": [
-          "不要用 transform 代替本应在 primitive/construct 阶段直接表达的尺寸信息。"
+          "能用更具体的 transform 时不要优先用 matrix。",
+          "不要在不清楚矩阵含义时盲填数值。"
         ],
         "commonMistakes": [
-          "在阵列和布尔前忘记统一坐标基准，导致对象错位。"
+          "矩阵元素顺序理解错误，导致平移、旋转、缩放混在一起。",
+          "本可用 translate/rotate/scale 清晰表达，却改用 matrix 降低可读性。"
         ],
         "recommendedBefore": [],
         "recommendedAfter": [
           "boolean.union",
           "boolean.subtract",
-          "pattern.linear",
-          "pattern.grid",
-          "pattern.radial"
+          "display.color",
+          "display.group"
         ],
         "stabilityNotes": [
-          "尽量先得到简单稳定的对象，再做 transform，而不是在草图阶段混入过多偏移。"
+          "matrix 是兜底能力，优先保持 action 序列可解释。"
         ],
         "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
-        "outputMeaning": "输出类型为 same-as-source，需结合上下文理解后续用法。",
+        "outputMeaning": "输出是施加矩阵后的对象，几何关系由矩阵决定，可读性低于专用 transform。",
         "example": {
           "id": "transform_matrix_example",
           "action": "transform.matrix",

@@ -27,7 +27,9 @@
             ]
           },
           "segments": {
-            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+            "default": 32,
+            "minimum": 4
           }
         },
         "additionalProperties": false
@@ -41,9 +43,12 @@
         "paramGuide": {
           "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
           "center": "vector2，长度为 2 的数值数组。 中心点坐标。 默认值 [0, 0]。",
-          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
         },
-        "constraints": [],
+        "constraints": [
+          "segments 省略时默认使用 32。",
+          "segments 若填写，必须大于等于 4。"
+        ],
         "whenToUse": [
           "需要生成二维截面、轮廓或拉伸前草图时使用。",
           "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
@@ -101,7 +106,9 @@
             ]
           },
           "segments": {
-            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+            "default": 32,
+            "minimum": 4
           }
         },
         "additionalProperties": false
@@ -115,9 +122,12 @@
         "paramGuide": {
           "radius": "vector2，长度为 2 的数值数组。 半径。",
           "center": "vector2，长度为 2 的数值数组。 中心点坐标。 默认值 [0, 0]。",
-          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
         },
-        "constraints": [],
+        "constraints": [
+          "segments 省略时默认使用 32。",
+          "segments 若填写，必须大于等于 4。"
+        ],
         "whenToUse": [
           "需要生成二维截面、轮廓或拉伸前草图时使用。",
           "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
@@ -253,12 +263,10 @@
           "radius": {
             "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
           },
-          "style": {
-            "$ref": "aiscad.dsl/actions/common.types#/$defs/cornerStyle",
-            "default": "round"
-          },
           "segments": {
-            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+            "default": 32,
+            "minimum": 4
           }
         },
         "additionalProperties": false
@@ -274,10 +282,12 @@
           "size": "vector2，长度为 2 的数值数组。 尺寸向量。2D 时为 [x, y]，3D 时为 [x, y, z]。",
           "center": "vector2，长度为 2 的数值数组。 中心点坐标。 默认值 [0, 0]。",
           "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
-          "style": "enum，可选值为 round / chamfer / edge。 默认值 \"round\"。",
-          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
         },
-        "constraints": [],
+        "constraints": [
+          "segments 省略时默认使用 32。",
+          "segments 若填写，必须大于等于 4。"
+        ],
         "whenToUse": [
           "需要生成二维截面、轮廓或拉伸前草图时使用。",
           "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
@@ -313,7 +323,6 @@
               0
             ],
             "radius": 4,
-            "style": "round",
             "segments": 32
           }
         }

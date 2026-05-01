@@ -4,7 +4,7 @@
   "category": "booleans",
   "actions": {
     "boolean.union": {
-      "role": "并集组合多个同维几何",
+      "role": "把多个同维对象合并成一个连续几何",
       "inputKinds": [
         "geom2",
         "geom3",
@@ -25,7 +25,7 @@
       },
       "llm": {
         "webSupported": true,
-        "summary": "并集组合多个同维几何",
+        "summary": "把多个同维对象合并成一个连续几何",
         "requiredParams": [
           "sources"
         ],
@@ -34,17 +34,17 @@
         },
         "constraints": [],
         "whenToUse": [
-          "需要组合、去料、求交时使用。",
-          "主体和特征都已清晰独立建好后，再进入布尔阶段。"
+          "需要把主体与新增特征并成一个几何体时使用。",
+          "适合把本应连成一体的对象合成为单个结果。"
         ],
         "whenNotToUse": [
-          "不要把布尔当成生成复杂结构的唯一手段。",
-          "不要在对象仍然语义混乱时连续叠加多层布尔。"
+          "不要仅仅为了把多个独立零件一起显示而使用 union；那更适合 display.group。",
+          "不要在对象关系还没定位清楚时盲目 union。"
         ],
         "commonMistakes": [
+          "希望保留独立零件，却误用了 union 导致它们变成一个体。",
           "输入对象维度不一致。",
-          "把超大阵列直接作为布尔工具体，增加失败或结果失控风险。",
-          "共面、贴边或几乎不相交的对象直接做布尔。"
+          "本来只想逻辑分组预览，却把 union 当成 group。"
         ],
         "recommendedBefore": [
           "solid.box",
@@ -58,11 +58,10 @@
           "transform.translate"
         ],
         "stabilityNotes": [
-          "优先先得到清晰 base，再用较少且明确的 tools/sources 做布尔。",
-          "布尔适合孔槽、拼接去料、实体拼合，不适合承担全部结构生成责任。"
+          "union 适合在定位完成后把新增特征并入主体，不要让它承担全部结构组织责任。"
         ],
         "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
-        "outputMeaning": "输出类型为 same-dimension，需结合上下文理解后续用法。",
+        "outputMeaning": "输出是单一几何结果，sources 不再彼此独立。",
         "example": {
           "id": "boolean_union_example",
           "action": "boolean.union",
@@ -112,19 +111,16 @@
         },
         "constraints": [],
         "whenToUse": [
-          "需要组合、去料、求交时使用。",
-          "主体和特征都已清晰独立建好后，再进入布尔阶段。",
-          "适合明确的开孔、开槽、型腔去料或从 base 中减去清晰特征。"
+          "适合明确的开孔、开窗、开槽、型腔去料或从 base 中减去清晰特征。",
+          "主体和工具体都已独立建好、且几何关系明确后再使用。"
         ],
         "whenNotToUse": [
-          "不要把布尔当成生成复杂结构的唯一手段。",
-          "不要在对象仍然语义混乱时连续叠加多层布尔。",
-          "不要把它当成轻量化骨架生成的唯一路径。"
+          "不要把 subtract 当成生成复杂结构的唯一手段。",
+          "不要在对象仍然语义混乱时连续叠加多层 subtract。",
+          "不要把它当成逻辑分组或输出组织方式。"
         ],
         "commonMistakes": [
-          "输入对象维度不一致。",
-          "把超大阵列直接作为布尔工具体，增加失败或结果失控风险。",
-          "共面、贴边或几乎不相交的对象直接做布尔。",
+          "tools 与 base 几乎不相交或只贴边，导致结果异常或不稳定。",
           "base 仍是 2D 草图却被当成最终 3D 结果理解。",
           "tools 数量很大时仍直接一次性减去全部阵列实例。"
         ],
@@ -146,7 +142,7 @@
           "如果 tools 来自大阵列，先确保阵列范围、间距和作用区域是可控的。"
         ],
         "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
-        "outputMeaning": "输出类型为 same-dimension-as-base，需结合上下文理解后续用法。",
+        "outputMeaning": "输出是 base 去掉 tools 后的单一几何，维度跟随 base。",
         "example": {
           "id": "boolean_subtract_example",
           "action": "boolean.subtract",
@@ -160,7 +156,7 @@
       }
     },
     "boolean.intersect": {
-      "role": "求多个同维几何的交集",
+      "role": "只保留多个同维对象的重叠部分",
       "inputKinds": [
         "geom2",
         "geom3",
@@ -181,7 +177,7 @@
       },
       "llm": {
         "webSupported": true,
-        "summary": "求多个同维几何的交集",
+        "summary": "只保留多个同维对象的重叠部分",
         "requiredParams": [
           "sources"
         ],
@@ -190,17 +186,17 @@
         },
         "constraints": [],
         "whenToUse": [
-          "需要组合、去料、求交时使用。",
-          "主体和特征都已清晰独立建好后，再进入布尔阶段。"
+          "需要用包围体、遮罩体或裁剪体截取主体有效区域时使用。",
+          "适合分件裁切、区域截取、把阵列限制在某个有效范围内。"
         ],
         "whenNotToUse": [
-          "不要把布尔当成生成复杂结构的唯一手段。",
-          "不要在对象仍然语义混乱时连续叠加多层布尔。"
+          "不要把 intersect 当成并集或普通分组。",
+          "不要期望它保留非重叠部分；非重叠部分会全部消失。"
         ],
         "commonMistakes": [
-          "输入对象维度不一致。",
-          "把超大阵列直接作为布尔工具体，增加失败或结果失控风险。",
-          "共面、贴边或几乎不相交的对象直接做布尔。"
+          "误以为 intersect 会得到两个对象的总外形。",
+          "sources 几乎不相交，结果接近空集。",
+          "输入对象维度不一致。"
         ],
         "recommendedBefore": [
           "solid.box",
@@ -214,11 +210,10 @@
           "transform.translate"
         ],
         "stabilityNotes": [
-          "优先先得到清晰 base，再用较少且明确的 tools/sources 做布尔。",
-          "布尔适合孔槽、拼接去料、实体拼合，不适合承担全部结构生成责任。"
+          "intersect 最适合用清晰的遮罩体裁剪目标区域，先确认重叠范围再使用。"
         ],
         "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
-        "outputMeaning": "输出类型为 same-dimension，需结合上下文理解后续用法。",
+        "outputMeaning": "输出只包含所有 sources 共同重叠的那一部分几何。",
         "example": {
           "id": "boolean_intersect_example",
           "action": "boolean.intersect",

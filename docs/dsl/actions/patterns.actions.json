@@ -49,22 +49,23 @@
           "step"
         ],
         "paramGuide": {
-          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
-          "count": "integer，整数，或 {\"$var\":\"变量名\"}。 复制次数。grid 模式必须是 [x, y, z]。",
-          "step": "vector3，长度为 3 的数值数组。 阵列步长向量。",
-          "origin": "vector3，长度为 3 的数值数组。 阵列起始偏移。 默认值 [0, 0, 0]。"
+          "source": "ref，字符串，引用前序 action 的 id。要被重复的基础对象或分组。",
+          "count": "integer，整数，或 {\"$var\":\"变量名\"}。线性阵列的总实例数，必须是整数。",
+          "step": "vector3，长度为 3 的数值数组。相邻两个实例之间的位移步长。",
+          "origin": "vector3，长度为 3 的数值数组。首个实例的附加偏移，不是整组中心点。 默认值 [0, 0, 0]。"
         },
         "constraints": [],
         "whenToUse": [
-          "需要重复特征、阵列孔位、均匀分布单元时使用。"
+          "需要沿单一方向、同一条边或同一直线重复特征时使用。",
+          "适合同边的多个孔、凸耳、肋、安装位或等距单元。"
         ],
         "whenNotToUse": [
-          "不要为了表达少量重复而引入超大阵列。",
-          "不要默认阵列结果天然已经限制在目标边界内。"
+          "不要用 linear 表达二维网格；那更适合 pattern.grid。",
+          "不要用 linear 表达对边对称副本；那更适合 transform.mirror。"
         ],
         "commonMistakes": [
-          "count、step、origin 配合错误导致阵列超范围。",
-          "把阵列 group 直接拿去做大规模布尔而没有控制作用区域。"
+          "把 count 理解成额外副本数量，而不是总实例数。",
+          "把 origin 当成整组中心，导致阵列整体偏移。"
         ],
         "recommendedBefore": [
           "solid.cylinder",
@@ -72,15 +73,16 @@
           "transform.translate"
         ],
         "recommendedAfter": [
+          "boolean.union",
           "boolean.subtract",
-          "display.group",
-          "transform.translate"
+          "transform.mirror",
+          "display.group"
         ],
         "stabilityNotes": [
-          "阵列越大，后续布尔越要谨慎；必要时先限制区域，再参与实体运算。"
+          "linear 更适合先把单个特征定义清楚，再沿一个方向复制，不要同时承担定位和裁边。"
         ],
         "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
-        "outputMeaning": "输出是逻辑分组，内部保留多个对象，后续需区分 group 与单体对象。",
+        "outputMeaning": "输出是 group，按 step 从 origin 开始线性排列 count 个实例。",
         "example": {
           "id": "pattern_linear_example",
           "action": "pattern.linear",
@@ -152,24 +154,24 @@
           "step"
         ],
         "paramGuide": {
-          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
-          "count": "array，固定长度 3。 复制次数。grid 模式必须是 [x, y, z]。",
-          "step": "vector3，长度为 3 的数值数组。 阵列步长向量。",
-          "origin": "vector3，长度为 3 的数值数组。 阵列起始偏移。 默认值 [0, 0, 0]。"
+          "source": "ref，字符串，引用前序 action 的 id。要被重复的基础对象或分组。",
+          "count": "array，固定长度 3。分别表示 x/y/z 三个方向上的总实例数，必须写成 [nx, ny, nz]。",
+          "step": "vector3，长度为 3 的数值数组。x/y/z 三个方向上相邻实例的步长。",
+          "origin": "vector3，长度为 3 的数值数组。首个实例的附加偏移，不是整个网格中心。 默认值 [0, 0, 0]。"
         },
         "constraints": [],
         "whenToUse": [
-          "需要重复特征、阵列孔位、均匀分布单元时使用。"
+          "需要在平面或体积中按行列/层规则重复单元时使用。",
+          "适合孔阵、格栅、规则分布的加强特征和重复单元。"
         ],
         "whenNotToUse": [
-          "不要为了表达少量重复而引入超大阵列。",
-          "不要默认阵列结果天然已经限制在目标边界内。"
+          "不要用 grid 表达单边一列重复；那更适合 pattern.linear。",
+          "不要假设 grid 自带裁边或保留外框；它只负责复制。"
         ],
         "commonMistakes": [
-          "count、step、origin 配合错误导致阵列超范围。",
-          "把阵列 group 直接拿去做大规模布尔而没有控制作用区域。",
-          "count 很大但没有评估后续布尔复杂度。",
-          "把 origin 当成中心点而不是首个实例的偏移。"
+          "把 count 写成单个数，而不是 [x, y, z]。",
+          "把 origin 当成整个网格中心，导致阵列落位错误。",
+          "count 很大却没有控制边界，导致后续布尔或预览复杂度暴涨。"
         ],
         "recommendedBefore": [
           "solid.cylinder",
@@ -178,15 +180,14 @@
         ],
         "recommendedAfter": [
           "boolean.subtract",
-          "display.group",
-          "transform.translate"
+          "boolean.intersect",
+          "display.group"
         ],
         "stabilityNotes": [
-          "阵列越大，后续布尔越要谨慎；必要时先限制区域，再参与实体运算。",
-          "大阵列更适合作为中间特征集合，不要默认它已经适配外轮廓边界。"
+          "grid 适合先生成规则单元集合，再由其他 action 决定是否裁边或参与布尔。"
         ],
         "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
-        "outputMeaning": "输出是逻辑分组，内部保留多个对象，后续需区分 group 与单体对象。",
+        "outputMeaning": "输出是 group，实例沿 x/y/z 方向形成规则网格排列。",
         "example": {
           "id": "pattern_grid_example",
           "action": "pattern.grid",
@@ -273,26 +274,28 @@
           "radius"
         ],
         "paramGuide": {
-          "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
-          "count": "integer，整数，或 {\"$var\":\"变量名\"}。 复制次数。grid 模式必须是 [x, y, z]。",
-          "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
-          "startAngle": "number，数值，或 {\"$var\":\"变量名\"}。 起始角度，单位为度。 默认值 0。",
-          "sweepAngle": "number，数值，或 {\"$var\":\"变量名\"}。 圆周阵列的扫掠角度，单位为度。 默认值 360。",
-          "axis": "enum，只能是 x、y、z。 坐标轴，只能是 x / y / z。 默认值 \"z\"。",
-          "center": "vector3，长度为 3 的数值数组。 中心点坐标。 默认值 [0, 0, 0]。",
-          "rotateItems": "boolean，布尔值，或 {\"$var\":\"变量名\"}。 阵列后是否同步旋转每个复制体。 默认值 true。"
+          "source": "ref，字符串，引用前序 action 的 id。要被绕轴复制的基础对象或分组。",
+          "count": "integer，整数，或 {\"$var\":\"变量名\"}。圆周上的总实例数。",
+          "radius": "number，数值，或 {\"$var\":\"变量名\"}。阵列半径；若为 0，实例会重叠在轴心附近。",
+          "startAngle": "number，数值，或 {\"$var\":\"变量名\"}。起始角度，单位为度。 默认值 0。",
+          "sweepAngle": "number，数值，或 {\"$var\":\"变量名\"}。沿圆周分布的总扫掠角度，单位为度。 默认值 360。",
+          "axis": "enum，只能是 x、y、z。 阵列围绕的坐标轴。 默认值 \"z\"。",
+          "center": "vector3，长度为 3 的数值数组。阵列圆心坐标。 默认值 [0, 0, 0]。",
+          "rotateItems": "boolean，布尔值，或 {\"$var\":\"变量名\"}。每个副本是否随圆周方向同步旋转。 默认值 true。"
         },
         "constraints": [],
         "whenToUse": [
-          "需要重复特征、阵列孔位、均匀分布单元时使用。"
+          "需要围绕某个中心轴做圆周均布时使用。",
+          "适合法兰孔、叶片、轮辐、圆周耳位等环形重复特征。"
         ],
         "whenNotToUse": [
-          "不要为了表达少量重复而引入超大阵列。",
-          "不要默认阵列结果天然已经限制在目标边界内。"
+          "不要用 radial 表达对边或左右两侧分布；那更适合 mirror 或 linear。",
+          "不要把 radius 设为 0 只为了复制对象；这通常会导致实例重叠。"
         ],
         "commonMistakes": [
-          "count、step、origin 配合错误导致阵列超范围。",
-          "把阵列 group 直接拿去做大规模布尔而没有控制作用区域。"
+          "把 radial 当成普通对称复制，结果特征跑到不该去的方位。",
+          "radius 为 0 或 center/axis 设错，导致实例重叠或转轴错误。",
+          "未判断 rotateItems 是否需要开启，导致副本朝向不符合预期。"
         ],
         "recommendedBefore": [
           "solid.cylinder",
@@ -300,15 +303,15 @@
           "transform.translate"
         ],
         "recommendedAfter": [
+          "boolean.union",
           "boolean.subtract",
-          "display.group",
-          "transform.translate"
+          "display.group"
         ],
         "stabilityNotes": [
-          "阵列越大，后续布尔越要谨慎；必要时先限制区域，再参与实体运算。"
+          "只有当特征确实围绕同一轴心重复时再用 radial；少量对称特征通常更适合 mirror。"
         ],
         "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
-        "outputMeaning": "输出是逻辑分组，内部保留多个对象，后续需区分 group 与单体对象。",
+        "outputMeaning": "输出是 group，实例分布在指定 axis 的圆周上，可选是否随角度同步旋转。",
         "example": {
           "id": "pattern_radial_example",
           "action": "pattern.radial",

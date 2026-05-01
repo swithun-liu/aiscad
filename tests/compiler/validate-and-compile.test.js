@@ -116,4 +116,204 @@ describe('validateAndCompileProgram', () => {
     expect(result.strategyWarnings.some((item) => item.code === 'large-pattern-instance-count')).toBe(true)
     expect(result.strategyWarnings.some((item) => item.code === 'pattern-group-used-as-subtract-tools')).toBe(true)
   })
+
+  test('solid.roundedBox compiles with default segments when omitted', () => {
+    const program = {
+      dsl: 'aiscad.dsl',
+      version: '1.0.0',
+      units: 'mm',
+      actions: [
+        {
+          id: 'shell',
+          action: 'solid.roundedBox',
+          params: {
+            size: [180, 120, 18],
+            center: [0, 0, 9],
+            radius: 4,
+          },
+        },
+      ],
+      result: 'shell',
+    }
+
+    const result = validateAndCompileProgram(program)
+    const [record] = result.resultRecords
+    const bbox = measurements.measureBoundingBox(record.value)
+
+    expect(record.kind).toBe('geom3')
+    expect(bbox[0][0]).toBeCloseTo(-90, 5)
+    expect(bbox[1][2]).toBeCloseTo(18, 5)
+  })
+
+  test('sketch.roundedRectangle compiles with default segments when omitted', () => {
+    const program = {
+      dsl: 'aiscad.dsl',
+      version: '1.0.0',
+      units: 'mm',
+      actions: [
+        {
+          id: 'profile',
+          action: 'sketch.roundedRectangle',
+          params: {
+            size: [180, 120],
+            center: [0, 0],
+            radius: 4,
+          },
+        },
+        {
+          id: 'body',
+          action: 'construct.extrudeLinear',
+          params: {
+            source: 'profile',
+            height: 18,
+          },
+        },
+      ],
+      result: 'body',
+    }
+
+    const result = validateAndCompileProgram(program)
+    const [record] = result.resultRecords
+    const bbox = measurements.measureBoundingBox(record.value)
+
+    expect(record.kind).toBe('geom3')
+    expect(bbox[0][0]).toBeCloseTo(-90, 5)
+    expect(bbox[1][1]).toBeCloseTo(60, 5)
+  })
+
+  test('applies shared default segments for common curved actions when omitted', () => {
+    const program = {
+      dsl: 'aiscad.dsl',
+      version: '1.0.0',
+      units: 'mm',
+      actions: [
+        {
+          id: 'arc',
+          action: 'curve.arc',
+          params: {
+            center: [0, 0],
+            radius: 20,
+            startAngle: 0,
+            endAngle: 180,
+          },
+        },
+        {
+          id: 'profile',
+          action: 'sketch.circle',
+          params: {
+            radius: 10,
+            center: [0, 0],
+          },
+        },
+        {
+          id: 'offset_profile',
+          action: 'modify.offset2d',
+          params: {
+            source: 'profile',
+            distance: 2,
+          },
+        },
+        {
+          id: 'revolved',
+          action: 'construct.extrudeRotate',
+          params: {
+            source: 'offset_profile',
+          },
+        },
+        {
+          id: 'sphere',
+          action: 'solid.sphere',
+          params: {
+            radius: 8,
+            center: [40, 0, 0],
+          },
+        },
+        {
+          id: 'result',
+          action: 'boolean.union',
+          params: {
+            sources: ['revolved', 'sphere'],
+          },
+        },
+      ],
+      result: 'result',
+    }
+
+    const result = validateAndCompileProgram(program)
+
+    expect(result.program.actions[0].params.segments).toBe(32)
+    expect(result.program.actions[1].params.segments).toBe(32)
+    expect(result.program.actions[2].params.segments).toBe(32)
+    expect(result.program.actions[3].params.segments).toBe(32)
+    expect(result.program.actions[4].params.segments).toBe(32)
+    expect(result.resultRecords[0].kind).toBe('geom3')
+  })
+
+  test('transform.rotate honors custom origin as pivot', () => {
+    const program = {
+      dsl: 'aiscad.dsl',
+      version: '1.0.0',
+      units: 'mm',
+      actions: [
+        {
+          id: 'box',
+          action: 'solid.box',
+          params: {
+            size: [10, 10, 10],
+            center: [20, 0, 0],
+          },
+        },
+        {
+          id: 'rotated',
+          action: 'transform.rotate',
+          params: {
+            source: 'box',
+            angles: [0, 0, 180],
+            origin: [10, 0, 0],
+          },
+        },
+      ],
+      result: 'rotated',
+    }
+
+    const result = validateAndCompileProgram(program)
+    const bbox = measurements.measureBoundingBox(result.resultRecords[0].value)
+
+    expect(bbox[0][0]).toBeCloseTo(-5, 5)
+    expect(bbox[1][0]).toBeCloseTo(5, 5)
+  })
+
+  test('transform.scale honors custom origin as pivot', () => {
+    const program = {
+      dsl: 'aiscad.dsl',
+      version: '1.0.0',
+      units: 'mm',
+      actions: [
+        {
+          id: 'box',
+          action: 'solid.box',
+          params: {
+            size: [10, 10, 10],
+            center: [20, 0, 0],
+          },
+        },
+        {
+          id: 'scaled',
+          action: 'transform.scale',
+          params: {
+            source: 'box',
+            factors: [2, 1, 1],
+            origin: [10, 0, 0],
+          },
+        },
+      ],
+      result: 'scaled',
+    }
+
+    const result = validateAndCompileProgram(program)
+    const bbox = measurements.measureBoundingBox(result.resultRecords[0].value)
+
+    expect(bbox[0][0]).toBeCloseTo(20, 5)
+    expect(bbox[1][0]).toBeCloseTo(40, 5)
+  })
 })

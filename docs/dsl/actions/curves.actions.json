@@ -112,7 +112,9 @@
             "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue"
           },
           "segments": {
-            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+            "default": 32,
+            "minimum": 4
           }
         },
         "additionalProperties": false
@@ -131,9 +133,12 @@
           "radius": "number，数值，或 {\"$var\":\"变量名\"}。 半径。",
           "startAngle": "number，数值，或 {\"$var\":\"变量名\"}。 起始角度，单位为度。",
           "endAngle": "number，数值，或 {\"$var\":\"变量名\"}。 结束角度，单位为度。",
-          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
         },
-        "constraints": [],
+        "constraints": [
+          "segments 省略时默认使用 32。",
+          "segments 若填写，必须大于等于 4。"
+        ],
         "whenToUse": [
           "需要先描述二维路径，再决定是否闭合成草图时使用。",
           "当后续会拼接路径、闭合轮廓或沿路径扫掠时使用。"
@@ -186,7 +191,9 @@
             "$ref": "aiscad.dsl/actions/common.types#/$defs/point2List"
           },
           "segments": {
-            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+            "default": 32,
+            "minimum": 4
           }
         },
         "additionalProperties": false
@@ -199,9 +206,12 @@
         ],
         "paramGuide": {
           "controlPoints": "point2[]，二维点数组。 控制点列表，用于贝塞尔路径。",
-          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
         },
-        "constraints": [],
+        "constraints": [
+          "segments 省略时默认使用 32。",
+          "segments 若填写，必须大于等于 4。"
+        ],
         "whenToUse": [
           "需要先描述二维路径，再决定是否闭合成草图时使用。",
           "当后续会拼接路径、闭合轮廓或沿路径扫掠时使用。"

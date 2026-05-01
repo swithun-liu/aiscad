@@ -27,7 +27,9 @@
             "default": "round"
           },
           "segments": {
-            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+            "default": 32,
+            "minimum": 4
           }
         },
         "additionalProperties": false
@@ -43,9 +45,12 @@
           "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
           "distance": "number，数值，或 {\"$var\":\"变量名\"}。 二维偏移距离。",
           "corners": "enum，可选值为 round / chamfer / edge。 角处理方式。 默认值 \"round\"。",
-          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
         },
-        "constraints": [],
+        "constraints": [
+          "segments 省略时默认使用 32。",
+          "segments 若填写，必须大于等于 4。"
+        ],
         "whenToUse": [
           "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
         ],
@@ -102,7 +107,9 @@
             "default": "round"
           },
           "segments": {
-            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+            "default": 32,
+            "minimum": 4
           }
         },
         "additionalProperties": false
@@ -118,9 +125,12 @@
           "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
           "delta": "number，数值，或 {\"$var\":\"变量名\"}。 扩张或收缩距离。",
           "corners": "enum，可选值为 round / chamfer / edge。 角处理方式。 默认值 \"round\"。",
-          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
         },
-        "constraints": [],
+        "constraints": [
+          "segments 省略时默认使用 32。",
+          "segments 若填写，必须大于等于 4。"
+        ],
         "whenToUse": [
           "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
         ],
@@ -177,7 +187,9 @@
             "default": "round"
           },
           "segments": {
-            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+            "default": 32,
+            "minimum": 4
           }
         },
         "additionalProperties": false
@@ -193,9 +205,12 @@
           "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
           "delta": "number，数值，或 {\"$var\":\"变量名\"}。 扩张或收缩距离。",
           "corners": "enum，可选值为 round / chamfer / edge。 角处理方式。 默认值 \"round\"。",
-          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。"
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。"
         },
-        "constraints": [],
+        "constraints": [
+          "segments 省略时默认使用 32。",
+          "segments 若填写，必须大于等于 4。"
+        ],
         "whenToUse": [
           "需要做偏移、膨胀、清理、凸包等几何后处理时使用。"
         ],

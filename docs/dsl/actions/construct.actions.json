@@ -110,7 +110,9 @@
             "default": 360
           },
           "segments": {
-            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue"
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/integerValue",
+            "default": 32,
+            "minimum": 4
           },
           "axis": {
             "$ref": "aiscad.dsl/actions/common.types#/$defs/axis",
@@ -128,10 +130,13 @@
         "paramGuide": {
           "source": "ref，字符串，引用前序 action 的 id。 单个输入对象引用，值必须是前面 action 的 id。",
           "angle": "number，数值，或 {\"$var\":\"变量名\"}。 旋转总角度，单位为度。 默认值 360。",
-          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑。",
+          "segments": "integer，整数，或 {\"$var\":\"变量名\"}。 分段数，越大越圆滑；省略时默认 32，若填写则必须大于等于 4。",
           "axis": "enum，只能是 x、y、z。 坐标轴，只能是 x / y / z。 默认值 \"z\"。"
         },
-        "constraints": [],
+        "constraints": [
+          "segments 省略时默认使用 32。",
+          "segments 若填写，必须大于等于 4。"
+        ],
         "whenToUse": [
           "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。"
         ],
