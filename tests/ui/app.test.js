@@ -10,8 +10,22 @@ function flushPromises() {
 
 describe('createApp', () => {
   beforeEach(() => {
+    vi.restoreAllMocks()
     document.body.innerHTML = '<div id="app"></div>'
     localStorage.clear()
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => ({
+      clearRect: () => {},
+      fillRect: () => {},
+      beginPath: () => {},
+      moveTo: () => {},
+      lineTo: () => {},
+      stroke: () => {},
+      fillStyle: '#000000',
+      strokeStyle: '#000000',
+      lineWidth: 1,
+      lineCap: 'round',
+      lineJoin: 'round',
+    }))
     if (!Range.prototype.getClientRects) {
       Range.prototype.getClientRects = () => []
     }
@@ -63,6 +77,7 @@ describe('createApp', () => {
     await flushPromises()
 
     expect(buildDslPrompt).toHaveBeenCalledTimes(1)
+    expect(buildDslPrompt.mock.calls[0][1]).toEqual({ sketch: null })
     expect(copyText).toHaveBeenCalledWith(expect.stringContaining('PROMPT:'))
   })
 
@@ -85,6 +100,7 @@ describe('createApp', () => {
     await flushPromises()
 
     expect(generateDslWithDeepSeek).toHaveBeenCalledTimes(1)
+    expect(generateDslWithDeepSeek.mock.calls[0][0]).toHaveProperty('sketch', null)
     expect(render).toHaveBeenCalled()
 
     const editorValue = document.querySelector('[data-role="json-editor"]').__jsonEditor.getValue()
@@ -121,5 +137,36 @@ describe('createApp', () => {
     expect(document.querySelector('[data-role="json-editor"]')).toBeTruthy()
     expect(document.querySelector('.cm-gutters')).toBeTruthy()
     expect(document.querySelector('.cm-content').textContent).toContain('"dsl": "aiscad.dsl"')
+  })
+
+  test('passes sketch data into prompt builder after drawing helper input', async () => {
+    const buildDslPrompt = vi.fn((description) => `PROMPT:${description}`)
+    const copyText = vi.fn(() => Promise.resolve())
+
+    createApp(document.querySelector('#app'), {
+      createViewer: () => ({ render: vi.fn(), exportStl: vi.fn() }),
+      buildDslPrompt,
+      copyText,
+    })
+
+    await flushPromises()
+
+    document.querySelector('[data-role="sketch-pad"]').__sketchPad.setSketchData({
+      strokes: [[
+        { x: 0.1, y: 0.2 },
+        { x: 0.3, y: 0.25 },
+        { x: 0.6, y: 0.4 },
+      ]],
+    })
+
+    document.querySelector('[data-action="copy-prompt"]').click()
+    await flushPromises()
+
+    expect(buildDslPrompt.mock.calls[0][1]).toEqual({
+      sketch: expect.objectContaining({
+        version: '1.0',
+        strokes: expect.any(Array),
+      }),
+    })
   })
 })

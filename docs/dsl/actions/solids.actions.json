@@ -81,6 +81,111 @@
         }
       }
     },
+    "solid.hollowBox": {
+      "role": "生成带指定壁厚和开口方向的盒状壳体",
+      "inputKinds": [],
+      "outputKind": "geom3",
+      "paramsSchema": {
+        "type": "object",
+        "required": [
+          "size",
+          "wallThickness"
+        ],
+        "properties": {
+          "size": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+          },
+          "center": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          },
+          "wallThickness": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue",
+            "exclusiveMinimum": 0
+          },
+          "openAxis": {
+            "$ref": "aiscad.dsl/actions/common.types#/$defs/axis",
+            "default": "z"
+          },
+          "openSide": {
+            "type": "string",
+            "enum": [
+              "positive",
+              "negative"
+            ],
+            "default": "negative"
+          }
+        },
+        "additionalProperties": false
+      },
+      "llm": {
+        "webSupported": true,
+        "summary": "生成带指定壁厚和开口方向的盒状壳体",
+        "requiredParams": [
+          "size",
+          "wallThickness"
+        ],
+        "paramGuide": {
+          "size": "vector3，长度为 3 的数值数组。外部包络尺寸，即整个盒状壳体的总长宽高。",
+          "center": "vector3，长度为 3 的数值数组。外部壳体中心点坐标。默认值 [0, 0, 0]。",
+          "wallThickness": "number，数值，或 {\"$var\":\"变量名\"}。统一壁厚。非开口方向会保留两侧壁厚，开口方向只保留一侧壁厚。",
+          "openAxis": "axis，字符串，只能是 x / y / z。壳体开口所沿的轴。默认值 \"z\"。",
+          "openSide": "enum，可选值：positive / negative。壳体开口位于 openAxis 的正侧或负侧。默认值 \"negative\"。"
+        },
+        "constraints": [
+          "wallThickness 必须大于 0。",
+          "在非开口轴上，外尺寸必须大于 2 倍 wallThickness；在开口轴上，外尺寸必须大于 wallThickness。",
+          "该 action 表达的是盒状壳体；size 是外尺寸，不是内腔尺寸。"
+        ],
+        "whenToUse": [
+          "需要表达盒体、盒盖、托盘、外壳等规则盒状壳体，并且已知外尺寸、壁厚和开口方向时使用。",
+          "当你本来会用 outer box 减 inner box 来手工构造壳体时，优先使用它。"
+        ],
+        "whenNotToUse": [
+          "不要把它用于非盒状、强曲面或自由形体壳体。",
+          "当需要不同面使用不同壁厚，或需要多个开口方向时，不要优先使用它。"
+        ],
+        "commonMistakes": [
+          "把 size 当成内腔尺寸，导致整体外形比需求大一圈。",
+          "把 wallThickness 只理解为侧壁厚度，却忘记开口对面的顶板也会保留该厚度。",
+          "openAxis 或 openSide 选错，导致开口方向与预期相反。"
+        ],
+        "recommendedBefore": [],
+        "recommendedAfter": [
+          "boolean.subtract",
+          "transform.translate",
+          "display.color"
+        ],
+        "stabilityNotes": [
+          "对于规则盒状壳体，solid.hollowBox 比手工用两个 box 做布尔差更稳定，也更不容易让 AI 算错内腔高度与中心点。"
+        ],
+        "inputExpectation": "该 action 不依赖前序几何输入。",
+        "outputMeaning": "输出是带统一壁厚且沿指定方向开口的盒状壳体实体，可继续开孔、添加凸耳或做装配特征。",
+        "example": {
+          "id": "solid_hollowBox_example",
+          "action": "solid.hollowBox",
+          "params": {
+            "size": [
+              180,
+              120,
+              18
+            ],
+            "center": [
+              0,
+              0,
+              9
+            ],
+            "wallThickness": 3,
+            "openAxis": "z",
+            "openSide": "negative"
+          }
+        }
+      }
+    },
     "solid.roundedBox": {
       "role": "生成圆角或倒角长方体",
       "inputKinds": [],
@@ -776,20 +881,27 @@
           "faces"
         ],
         "paramGuide": {
-          "points": "point3[]，三维点数组。 点列表，按顺序定义轮廓或路径。",
-          "faces": "array，数组。 面索引列表。",
+          "points": "point3[]，三维点数组。顶点坐标列表，所有 faces 都只能引用这里的索引。",
+          "faces": "array，数组。面索引列表；每个面至少 3 个顶点索引，且应共同构成闭合实体。",
           "orientation": "enum，可选值：outward / inward。 多面体面朝向。 默认值 \"outward\"。"
         },
-        "constraints": [],
+        "constraints": [
+          "faces 中的索引必须引用 points 中存在的顶点。",
+          "各个面应共同构成闭合实体，面朝向需尽量一致；否则可能出现缺面、翻面或看起来像空壳。",
+          "当目标只是规则小特征、斜面台阶或局部回钩时，不要优先使用 polyhedron。"
+        ],
         "whenToUse": [
-          "可以直接用基础体表达主体时优先使用。",
-          "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+          "标准 primitive、二维草图拉伸或回转都难以表达时使用。",
+          "需要显式控制顶点位置与面连接关系，或需要构造非标准网格实体时使用。"
         ],
         "whenNotToUse": [
-          "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+          "不要把 polyhedron 当成做小型规则特征的首选，例如简单凸耳、台阶、回钩、肋或规则斜面。",
+          "当结构可以用 sketch + construct.extrudeLinear，或 primitive + boolean 更稳定表达时，不要优先使用它。"
         ],
         "commonMistakes": [
-          "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+          "faces 的顶点顺序不一致，导致法线翻转、缺面或透明预览时像空壳。",
+          "面没有真正闭合成实体，或不同面之间存在缝隙、重叠和自交。",
+          "顶点索引写错，引用了不存在的点，或同一局部特征本可用更简单 action 却强行使用 polyhedron。"
         ],
         "recommendedBefore": [],
         "recommendedAfter": [
@@ -799,10 +911,11 @@
           "boolean.subtract"
         ],
         "stabilityNotes": [
-          "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+          "polyhedron 自由度高但风险也高；对 AI 来说比 primitive、polygon + extrude 或 boolean 路线更容易出错。",
+          "规则小特征优先使用 primitive + boolean；带角度的截面优先使用 sketch.polygon + construct.extrudeLinear。"
         ],
-        "inputExpectation": "该 action 不依赖前序几何输入。",
-        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+        "inputExpectation": "该 action 不依赖前序几何输入，但 points 与 faces 必须成套设计，不能只凭局部感觉临时拼接。",
+        "outputMeaning": "输出是由显式顶点和面定义的三维实体，适合表达非标准网格形体，但稳定性依赖顶点与面的拓扑质量。",
         "example": {
           "id": "solid_polyhedron_example",
           "action": "solid.polyhedron",

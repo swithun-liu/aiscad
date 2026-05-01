@@ -105,6 +105,37 @@ function normalizedSegments(value, fallback = 32) {
   return Math.max(4, value ?? fallback)
 }
 
+function compileHollowBox(params) {
+  const axisIndex = { x: 0, y: 1, z: 2 }[params.openAxis || 'z']
+  const openSide = params.openSide || 'negative'
+  const wallThickness = params.wallThickness
+  const outerSize = params.size
+  const outerCenter = params.center || [0, 0, 0]
+
+  const innerSize = [...outerSize]
+  for (let index = 0; index < 3; index += 1) {
+    innerSize[index] -= index === axisIndex ? wallThickness : wallThickness * 2
+  }
+
+  if (innerSize.some((value) => value <= 0)) {
+    throw new Error('solid.hollowBox 的 wallThickness 过大，内腔尺寸必须保持为正')
+  }
+
+  const innerCenter = [...outerCenter]
+  innerCenter[axisIndex] += openSide === 'positive' ? wallThickness / 2 : -wallThickness / 2
+
+  const outer = primitives.cuboid({
+    size: outerSize,
+    center: outerCenter,
+  })
+  const inner = primitives.cuboid({
+    size: innerSize,
+    center: innerCenter,
+  })
+
+  return booleans.subtract(outer, inner)
+}
+
 function wrapRecord(kind, value, color = null) {
   return { kind, value, color }
 }
@@ -309,6 +340,8 @@ function compileAction(node, state) {
       throw new Error('sketch.text 首版 Web 应用暂不支持')
     case 'solid.box':
       return wrapRecord('geom3', primitives.cuboid(params))
+    case 'solid.hollowBox':
+      return wrapRecord('geom3', compileHollowBox(params))
     case 'solid.roundedBox':
       return wrapRecord('geom3', primitives.roundedCuboid({
         size: params.size,

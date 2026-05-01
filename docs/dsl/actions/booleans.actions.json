@@ -30,21 +30,25 @@
           "sources"
         ],
         "paramGuide": {
-          "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
+          "sources": "ref[]，字符串数组，引用多个前序 action 的 id。若目标是单一实体，这些对象应在几何上真正重叠，而不只是表面接触。"
         },
-        "constraints": [],
+        "constraints": [
+          "sources 中的对象必须是同维几何。",
+          "如果目标是熔成一个连续实体，sources 之间应存在明确的面积重叠或体积重叠，不要只共面、共边或单点接触。",
+          "如果只是想把多个独立零件一起输出或预览，不要使用 union，应改用 display.group。"
+        ],
         "whenToUse": [
-          "需要把主体与新增特征并成一个几何体时使用。",
-          "适合把本应连成一体的对象合成为单个结果。"
+          "需要把主体与新增特征真正熔合成一个连续几何体时使用。",
+          "适合主体与凸台、肋、卡扣臂、法兰、局部补强等已经定位完成，且彼此存在明确重叠关系的场景。"
         ],
         "whenNotToUse": [
           "不要仅仅为了把多个独立零件一起显示而使用 union；那更适合 display.group。",
-          "不要在对象关系还没定位清楚时盲目 union。"
+          "不要在对象只是刚好贴面、碰边或碰点时盲目 union；这种零厚度接触对布尔非常不稳定。"
         ],
         "commonMistakes": [
+          "以为两个对象只要视觉上贴住，union 就一定能稳定变成一个整体。",
           "希望保留独立零件，却误用了 union 导致它们变成一个体。",
-          "输入对象维度不一致。",
-          "本来只想逻辑分组预览，却把 union 当成 group。"
+          "输入对象维度不一致，或附着特征与主体几乎没有实际重叠。"
         ],
         "recommendedBefore": [
           "solid.box",
@@ -58,10 +62,11 @@
           "transform.translate"
         ],
         "stabilityNotes": [
+          "union 更稳定的前提是几何上存在明确重叠；对附着特征，通常要让它略微嵌入主体，而不是刚好贴在表面。",
           "union 适合在定位完成后把新增特征并入主体，不要让它承担全部结构组织责任。"
         ],
         "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
-        "outputMeaning": "输出是单一几何结果，sources 不再彼此独立。",
+        "outputMeaning": "输出是单一几何结果，sources 不再彼此独立；如果输入之间只有接触而没有真实重叠，结果可能不稳定。",
         "example": {
           "id": "boolean_union_example",
           "action": "boolean.union",

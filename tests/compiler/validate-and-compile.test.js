@@ -145,6 +145,39 @@ describe('validateAndCompileProgram', () => {
     expect(bbox[1][2]).toBeCloseTo(18, 5)
   })
 
+  test('solid.hollowBox builds an open shell with correct wall thickness defaults', () => {
+    const program = {
+      dsl: 'aiscad.dsl',
+      version: '1.0.0',
+      units: 'mm',
+      actions: [
+        {
+          id: 'lid_shell',
+          action: 'solid.hollowBox',
+          params: {
+            size: [180, 120, 18],
+            center: [0, 0, 9],
+            wallThickness: 3,
+          },
+        },
+      ],
+      result: 'lid_shell',
+    }
+
+    const result = validateAndCompileProgram(program)
+    const [record] = result.resultRecords
+    const bbox = measurements.measureBoundingBox(record.value)
+    const volume = measurements.measureVolume(record.value)
+
+    expect(result.program.actions[0].params.openAxis).toBe('z')
+    expect(result.program.actions[0].params.openSide).toBe('negative')
+    expect(record.kind).toBe('geom3')
+    expect(bbox[0][0]).toBeCloseTo(-90, 5)
+    expect(bbox[1][2]).toBeCloseTo(18, 5)
+    expect(volume).toBeGreaterThan(91000)
+    expect(volume).toBeLessThan(91500)
+  })
+
   test('sketch.roundedRectangle compiles with default segments when omitted', () => {
     const program = {
       dsl: 'aiscad.dsl',

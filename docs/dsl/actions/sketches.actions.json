@@ -351,19 +351,24 @@
           "points"
         ],
         "paramGuide": {
-          "points": "point2[]，二维点数组。 点列表，按顺序定义轮廓或路径。"
+          "points": "point2[]，二维点数组。点应按轮廓边界顺序依次给出，用来定义一个平面截面或轮廓。"
         },
-        "constraints": [],
+        "constraints": [
+          "points 应按轮廓顺序围成一个不自交的平面多边形，不要来回跳点。",
+          "polygon 表达的是二维截面；不要把三维上下关系、悬空关系或网格拓扑直接塞进 points。"
+        ],
         "whenToUse": [
-          "需要生成二维截面、轮廓或拉伸前草图时使用。",
-          "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+          "需要表达带斜边、台阶、回钩、肋截面、异形轮廓等非圆非矩形的平面截面时使用。",
+          "当目标特征可以先定义稳定二维截面，再用 construct.extrudeLinear 拉成三维时，优先使用它。"
         ],
         "whenNotToUse": [
-          "不要把 geom2 当成已经具有厚度的实体理解。"
+          "不要把 polygon 当成直接定义复杂三维网格实体的工具；那更接近 polyhedron 的职责。",
+          "当 rectangle、circle、roundedRectangle 等更简单草图已足够表达时，不要优先使用 polygon。"
         ],
         "commonMistakes": [
-          "草图还未封闭就直接进入实体构造。",
-          "把过多细节堆在单个草图里，导致后续布尔难维护。"
+          "点序混乱、轮廓自交或局部折返，导致后续拉伸和布尔不稳定。",
+          "本来只是简单矩形或圆角矩形，却硬写很多 points，降低可读性与稳定性。",
+          "截面画得刚好贴边，拉伸后只与主体共面接触，后续 union 仍然不稳。"
         ],
         "recommendedBefore": [],
         "recommendedAfter": [
@@ -372,10 +377,11 @@
           "boolean.subtract"
         ],
         "stabilityNotes": [
-          "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+          "对于带角度的局部规则特征，sketch.polygon + construct.extrudeLinear 通常比 solid.polyhedron 更稳。",
+          "尽量先画简单、清晰、单一职责的截面，再通过拉伸和定位得到三维特征。"
         ],
         "inputExpectation": "该 action 不依赖前序几何输入。",
-        "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
+        "outputMeaning": "输出是二维草图/截面，没有厚度，通常会继续拉伸成实体；它特别适合表达带角度的规则局部截面。",
         "example": {
           "id": "sketch_polygon_example",
           "action": "sketch.polygon",

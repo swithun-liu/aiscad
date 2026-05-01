@@ -16,7 +16,7 @@ function extractJsonObject(text) {
   return JSON.parse(text.slice(start, end + 1))
 }
 
-export async function generateDslWithDeepSeek({ apiKey, model, description }) {
+export async function generateDslWithDeepSeek({ apiKey, model, description, sketch }) {
   if (!apiKey) throw new Error('请先填写 DeepSeek API Key')
   if (!description.trim()) throw new Error('请先填写模型描述')
 
@@ -33,7 +33,7 @@ export async function generateDslWithDeepSeek({ apiKey, model, description }) {
       messages: [
         {
           role: 'system',
-          content: buildDslPrompt(description),
+          content: buildDslPrompt(description, { sketch }),
         },
         {
           role: 'user',

@@ -46,19 +46,25 @@
           "twistAngle": "number，数值，或 {\"$var\":\"变量名\"}。 拉伸扭转角度，单位为度。 默认值 0。",
           "twistSteps": "integer，整数，或 {\"$var\":\"变量名\"}。 扭转插值步数。 默认值 1。"
         },
-        "constraints": [],
+        "constraints": [
+          "source 应是有效的封闭二维草图。",
+          "如果拉伸结果后续要参与 union 或 subtract，其高度与定位应确保和目标存在明确重叠，而不是只停在接触边界。"
+        ],
         "whenToUse": [
           "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。",
-          "板件、法兰、孔槽、轮廓类实体通常优先用它从稳定草图得到实体。"
+          "板件、法兰、孔槽、轮廓类实体通常优先用它从稳定草图得到实体。",
+          "带角度的局部回钩、楔形凸耳、加强肋、异形截面特征，通常优先用稳定草图拉伸得到。"
         ],
         "whenNotToUse": [
-          "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+          "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。",
+          "不要拿它去拉伸自交、语义混乱或明显不稳定的草图。"
         ],
         "commonMistakes": [
           "把 2D 中间态当成最终实体结果。",
           "对不稳定草图直接拉伸，导致后续布尔复杂度升高。",
           "source 仍是开路径或无效草图。",
-          "得到 geom3 后又继续按二维心智理解结果。"
+          "得到 geom3 后又继续按二维心智理解结果。",
+          "拉伸出的附着特征只在一个面上贴住主体就直接 union，导致结果不稳定。"
         ],
         "recommendedBefore": [
           "sketch.rectangle",
@@ -74,10 +80,11 @@
         ],
         "stabilityNotes": [
           "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。",
-          "这是从二维草图进入可打印实体的常见稳定路径。"
+          "这是从二维草图进入可打印实体的常见稳定路径。",
+          "带角度的局部规则特征优先用 sketch.polygon + construct.extrudeLinear，通常比直接写 solid.polyhedron 更稳。"
         ],
         "inputExpectation": "输入通常来自这些类型之一：geom2。",
-        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+        "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础；若用于附着特征，通常还会继续 translate 并与主体形成明确重叠。",
         "example": {
           "id": "construct_extrudeLinear_example",
           "action": "construct.extrudeLinear",

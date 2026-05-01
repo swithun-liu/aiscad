@@ -3,6 +3,7 @@ import { actionDefinitions } from './lib/dsl/definitions.js'
 import { buildActionFocusView, getActionIdAtCursor } from './lib/dsl/action-focus.js'
 import { validateAndCompileProgram } from './lib/dsl/compiler.js'
 import { createJsonEditor } from './lib/editor/json-editor.js'
+import { createSketchPad } from './lib/input/sketch-pad.js'
 import { buildDslPrompt, SUPPORTED_ACTION_NAMES } from './lib/dsl/prompt.js'
 import { ThreeCadViewer } from './lib/renderer/three-viewer.js'
 import { VISUAL_TEST_CASES, getVisualTestCase } from './lib/testing/cases.js'
@@ -12,6 +13,7 @@ const STORAGE_KEYS = {
   apiKey: 'aiscad.deepseekApiKey',
   model: 'aiscad.deepseekModel',
   description: 'aiscad.lastDescription',
+  sketch: 'aiscad.sketchInput',
 }
 
 export const EXAMPLE_DESCRIPTION = '生成一个 120x80x10 mm 的底板，四角各有一个直径 6 mm 的穿孔，孔中心距离边缘 10 mm，整体显示蓝色。'
@@ -114,6 +116,24 @@ function readField(key, fallback = '') {
   return localStorage.getItem(key) || fallback
 }
 
+function readJsonField(key) {
+  const raw = localStorage.getItem(key)
+  if (!raw) return null
+  try {
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
+function persistJsonField(key, value) {
+  if (!value) {
+    localStorage.removeItem(key)
+    return
+  }
+  localStorage.setItem(key, JSON.stringify(value))
+}
+
 export function buildStlFileName(description) {
   const baseName = (description || 'aiscad-model')
     .trim()
@@ -127,6 +147,15 @@ function collectSupportedActions() {
   return SUPPORTED_ACTION_NAMES
     .map((name) => `<li><code>${name}</code> - ${actionDefinitions[name].role}</li>`)
     .join('')
+}
+
+function summarizeSketch(sketch) {
+  if (!sketch?.strokes?.length) {
+    return '未提供草图；可手绘局部截面、卡扣方向、拼接关系等空间提示。'
+  }
+
+  const pointCount = sketch.strokes.reduce((sum, stroke) => sum + stroke.length, 0)
+  return `已提供草图：${sketch.strokes.length} 条笔画，${pointCount} 个关键点；复制 Prompt 或直连生成时会一起作为辅助输入。`
 }
 
 function formatMetricValue(value) {
@@ -303,6 +332,17 @@ export function createApp(root, dependencies = {}) {
           <textarea data-role="description" rows="8" placeholder="例如：生成一个带四角安装孔的底板"></textarea>
         </label>
 
+        <section class="field">
+          <span>草图辅助输入</span>
+          <div class="sketch-card">
+            <div data-role="sketch-pad" class="sketch-pad"></div>
+            <div class="button-row compact">
+              <button data-action="clear-sketch" type="button">清空草图</button>
+            </div>
+            <p class="muted sketch-summary" data-role="sketch-summary">未提供草图；可手绘局部截面、卡扣方向、拼接关系等空间提示。</p>
+          </div>
+        </section>
+
         <div class="button-row">
           <button data-action="generate" class="primary">AI 生成并渲染</button>
           <button data-action="render-json">渲染当前 JSON</button>
@@ -372,6 +412,7 @@ export function createApp(root, dependencies = {}) {
   const apiKeyInput = el('[data-role="api-key"]', root)
   const modelInput = el('[data-role="model"]', root)
   const descriptionInput = el('[data-role="description"]', root)
+  const sketchSummary = el('[data-role="sketch-summary"]', root)
   const viewer = createViewer(el('[data-role="viewer"]', root))
   const visualLabState = {
     activeCaseId: VISUAL_TEST_CASES[0]?.id || null,
@@ -387,10 +428,18 @@ export function createApp(root, dependencies = {}) {
     onChange: () => syncEditorFocus(root, viewer, jsonEditor, appState),
     onSelectionChange: () => syncEditorFocus(root, viewer, jsonEditor, appState),
   })
+  const sketchPad = createSketchPad(el('[data-role="sketch-pad"]', root), {
+    value: readJsonField(STORAGE_KEYS.sketch),
+    onChange: (sketch) => {
+      persistJsonField(STORAGE_KEYS.sketch, sketch)
+      sketchSummary.textContent = summarizeSketch(sketch)
+    },
+  })
 
   apiKeyInput.value = readField(STORAGE_KEYS.apiKey)
   modelInput.value = readField(STORAGE_KEYS.model, 'deepseek-chat')
   descriptionInput.value = readField(STORAGE_KEYS.description, EXAMPLE_DESCRIPTION)
+  sketchSummary.textContent = summarizeSketch(sketchPad.getSketchData())
   renderVisualLab(root, visualLabState)
 
   apiKeyInput.addEventListener('change', () => persistField(STORAGE_KEYS.apiKey, apiKeyInput.value.trim()))
@@ -408,7 +457,7 @@ export function createApp(root, dependencies = {}) {
       if (!description) {
         throw new Error('请先填写模型描述，再复制 Prompt')
       }
-      await copy(buildPrompt(description))
+      await copy(buildPrompt(description, { sketch: sketchPad.getSketchData() }))
       setError(root)
       setWarnings(root)
       setStatus(root, '完整 Prompt 已复制，可直接发给任意 chat AI 生成 DSL JSON。', 'success')
@@ -417,6 +466,13 @@ export function createApp(root, dependencies = {}) {
       setWarnings(root)
       setStatus(root, '复制 Prompt 失败', 'error')
     }
+  })
+
+  el('[data-action="clear-sketch"]', root).addEventListener('click', () => {
+    sketchPad.clear()
+    setError(root)
+    setWarnings(root, appState.compiled?.strategyWarnings || [])
+    setStatus(root, '草图已清空。', 'success')
   })
 
   el('[data-action="load-example-json"]', root).addEventListener('click', async () => {
@@ -539,6 +595,7 @@ export function createApp(root, dependencies = {}) {
         apiKey: apiKeyInput.value.trim(),
         model: modelInput.value.trim() || 'deepseek-chat',
         description: descriptionInput.value.trim(),
+        sketch: sketchPad.getSketchData(),
       })
       jsonEditor.setValue(formatJson(program))
       await renderProgram(root, viewer, program, appState, { jsonEditor })

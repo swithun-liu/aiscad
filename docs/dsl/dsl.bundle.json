@@ -166,220 +166,241 @@
     }
   },
   "common": {
-    "types": {
-      "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "$id": "aiscad.dsl/actions/common.types",
-      "$defs": {
-        "ref": {
-          "type": "string",
-          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "aiscad.dsl/actions/common.types",
+    "$defs": {
+      "ref": {
+        "type": "string",
+        "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+      },
+      "refList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/ref"
         },
-        "refList": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/ref"
+        "minItems": 1
+      },
+      "numberValue": {
+        "oneOf": [
+          {
+            "type": "number"
           },
-          "minItems": 1
-        },
-        "numberValue": {
-          "oneOf": [
-            {
-              "type": "number"
+          {
+            "type": "object",
+            "required": [
+              "$var"
+            ],
+            "properties": {
+              "$var": {
+                "type": "string",
+                "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+              }
             },
-            {
-              "type": "object",
-              "required": [
-                "$var"
-              ],
-              "properties": {
-                "$var": {
-                  "type": "string",
-                  "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
-        "booleanValue": {
-          "oneOf": [
-            {
-              "type": "boolean"
+            "additionalProperties": false
+          }
+        ]
+      },
+      "booleanValue": {
+        "oneOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "object",
+            "required": [
+              "$var"
+            ],
+            "properties": {
+              "$var": {
+                "type": "string",
+                "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+              }
             },
-            {
-              "type": "object",
-              "required": [
-                "$var"
-              ],
-              "properties": {
-                "$var": {
-                  "type": "string",
-                  "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
-        "stringValue": {
-          "oneOf": [
-            {
-              "type": "string"
+            "additionalProperties": false
+          }
+        ]
+      },
+      "stringValue": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "required": [
+              "$var"
+            ],
+            "properties": {
+              "$var": {
+                "type": "string",
+                "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+              }
             },
-            {
-              "type": "object",
-              "required": [
-                "$var"
-              ],
-              "properties": {
-                "$var": {
-                  "type": "string",
-                  "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
-        "integerValue": {
-          "oneOf": [
-            {
-              "type": "integer"
+            "additionalProperties": false
+          }
+        ]
+      },
+      "integerValue": {
+        "oneOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "object",
+            "required": [
+              "$var"
+            ],
+            "properties": {
+              "$var": {
+                "type": "string",
+                "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+              }
             },
-            {
-              "type": "object",
-              "required": [
-                "$var"
-              ],
-              "properties": {
-                "$var": {
-                  "type": "string",
-                  "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
+            "additionalProperties": false
+          }
+        ]
+      },
+      "vector2": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/numberValue"
         },
-        "vector2": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/numberValue"
-          },
-          "minItems": 2,
-          "maxItems": 2
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "vector3": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/numberValue"
         },
-        "vector3": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/numberValue"
-          },
-          "minItems": 3,
-          "maxItems": 3
+        "minItems": 3,
+        "maxItems": 3
+      },
+      "vector4": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/numberValue"
         },
-        "vector4": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/numberValue"
-          },
-          "minItems": 4,
-          "maxItems": 4
+        "minItems": 4,
+        "maxItems": 4
+      },
+      "point2List": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/vector2"
         },
-        "point2List": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/vector2"
-          },
-          "minItems": 2
+        "minItems": 2
+      },
+      "point3List": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/vector3"
         },
-        "point3List": {
-          "type": "array",
-          "items": {
+        "minItems": 3
+      },
+      "rgba": {
+        "type": "array",
+        "items": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "minItems": 4,
+        "maxItems": 4
+      },
+      "axis": {
+        "type": "string",
+        "enum": [
+          "x",
+          "y",
+          "z"
+        ]
+      },
+      "cornerStyle": {
+        "type": "string",
+        "enum": [
+          "round",
+          "chamfer",
+          "edge"
+        ]
+      },
+      "caps": {
+        "type": "string",
+        "enum": [
+          "none",
+          "start",
+          "end",
+          "both"
+        ]
+      },
+      "plane": {
+        "type": "object",
+        "required": [
+          "origin",
+          "normal"
+        ],
+        "properties": {
+          "origin": {
             "$ref": "#/$defs/vector3"
           },
-          "minItems": 3
+          "normal": {
+            "$ref": "#/$defs/vector3"
+          }
         },
-        "rgba": {
+        "additionalProperties": false
+      },
+      "matrix4x4": {
+        "type": "array",
+        "items": {
           "type": "array",
           "items": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1
+            "$ref": "#/$defs/numberValue"
           },
           "minItems": 4,
           "maxItems": 4
         },
-        "axis": {
-          "type": "string",
-          "enum": [
-            "x",
-            "y",
-            "z"
-          ]
+        "minItems": 4,
+        "maxItems": 4
+      },
+      "kind": {
+        "type": "string",
+        "enum": [
+          "curve2",
+          "geom2",
+          "geom3",
+          "group"
+        ]
+      },
+      "kindList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/kind"
         },
-        "cornerStyle": {
-          "type": "string",
-          "enum": [
-            "round",
-            "chamfer",
-            "edge"
-          ]
-        },
-        "caps": {
-          "type": "string",
-          "enum": [
-            "none",
-            "start",
-            "end",
-            "both"
-          ]
-        },
-        "plane": {
-          "type": "object",
-          "required": [
-            "origin",
-            "normal"
-          ],
-          "properties": {
-            "origin": {
-              "$ref": "#/$defs/vector3"
-            },
-            "normal": {
-              "$ref": "#/$defs/vector3"
-            }
-          },
-          "additionalProperties": false
-        },
-        "matrix4x4": {
-          "type": "array",
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/$defs/numberValue"
-            },
-            "minItems": 4,
-            "maxItems": 4
-          },
-          "minItems": 4,
-          "maxItems": 4
-        },
-        "kind": {
-          "type": "string",
-          "enum": [
-            "curve2",
-            "geom2",
-            "geom3",
-            "group"
-          ]
-        },
-        "kindList": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/kind"
-          },
-          "minItems": 1,
-          "uniqueItems": true
-        }
+        "minItems": 1,
+        "uniqueItems": true
+      }
+    },
+    "llm": {
+      "purpose": "公共参数类型定义，所有 action 的 paramsSchema 都会引用这里。可以直接给大模型阅读。",
+      "readRule": "看到 $ref 指向这里时，按对应类型说明理解参数格式。",
+      "typeGuide": {
+        "ref": "字符串，引用前面 action 的 id。",
+        "refList": "字符串数组，引用多个前面 action 的 id。",
+        "numberValue": "数值，或 {\"$var\":\"变量名\"}。",
+        "booleanValue": "布尔值，或 {\"$var\":\"变量名\"}。",
+        "stringValue": "字符串，或 {\"$var\":\"变量名\"}。",
+        "integerValue": "整数，或 {\"$var\":\"变量名\"}。",
+        "vector2": "长度为 2 的数值数组。",
+        "vector3": "长度为 3 的数值数组。",
+        "vector4": "长度为 4 的数值数组。",
+        "point2List": "二维点数组，例如 [[0,0],[10,0],[10,10]]。",
+        "point3List": "三维点数组。",
+        "rgba": "颜色数组 [r,g,b,a]，范围 0 到 1。",
+        "axis": "字符串，只能是 x / y / z。",
+        "cornerStyle": "字符串，只能是 round / chamfer / edge。",
+        "caps": "字符串，只能是 none / start / end / both。",
+        "plane": "对象，格式为 { origin:[x,y,z], normal:[x,y,z] }。",
+        "matrix4x4": "4x4 数值矩阵。"
       }
     }
   },
@@ -1135,19 +1156,24 @@
               "points"
             ],
             "paramGuide": {
-              "points": "point2[]，二维点数组。 点列表，按顺序定义轮廓或路径。"
+              "points": "point2[]，二维点数组。点应按轮廓边界顺序依次给出，用来定义一个平面截面或轮廓。"
             },
-            "constraints": [],
+            "constraints": [
+              "points 应按轮廓顺序围成一个不自交的平面多边形，不要来回跳点。",
+              "polygon 表达的是二维截面；不要把三维上下关系、悬空关系或网格拓扑直接塞进 points。"
+            ],
             "whenToUse": [
-              "需要生成二维截面、轮廓或拉伸前草图时使用。",
-              "当目标实体适合先 2D 后 3D 的稳定建模路径时优先使用。"
+              "需要表达带斜边、台阶、回钩、肋截面、异形轮廓等非圆非矩形的平面截面时使用。",
+              "当目标特征可以先定义稳定二维截面，再用 construct.extrudeLinear 拉成三维时，优先使用它。"
             ],
             "whenNotToUse": [
-              "不要把 geom2 当成已经具有厚度的实体理解。"
+              "不要把 polygon 当成直接定义复杂三维网格实体的工具；那更接近 polyhedron 的职责。",
+              "当 rectangle、circle、roundedRectangle 等更简单草图已足够表达时，不要优先使用 polygon。"
             ],
             "commonMistakes": [
-              "草图还未封闭就直接进入实体构造。",
-              "把过多细节堆在单个草图里，导致后续布尔难维护。"
+              "点序混乱、轮廓自交或局部折返，导致后续拉伸和布尔不稳定。",
+              "本来只是简单矩形或圆角矩形，却硬写很多 points，降低可读性与稳定性。",
+              "截面画得刚好贴边，拉伸后只与主体共面接触，后续 union 仍然不稳。"
             ],
             "recommendedBefore": [],
             "recommendedAfter": [
@@ -1156,10 +1182,11 @@
               "boolean.subtract"
             ],
             "stabilityNotes": [
-              "板件、孔槽、法兰轮廓通常优先先草图后拉伸。"
+              "对于带角度的局部规则特征，sketch.polygon + construct.extrudeLinear 通常比 solid.polyhedron 更稳。",
+              "尽量先画简单、清晰、单一职责的截面，再通过拉伸和定位得到三维特征。"
             ],
             "inputExpectation": "该 action 不依赖前序几何输入。",
-            "outputMeaning": "输出是二维草图/截面，没有厚度，通常需要进一步构造为实体。",
+            "outputMeaning": "输出是二维草图/截面，没有厚度，通常会继续拉伸成实体；它特别适合表达带角度的规则局部截面。",
             "example": {
               "id": "sketch_polygon_example",
               "action": "sketch.polygon",
@@ -1431,6 +1458,111 @@
                   0,
                   0
                 ]
+              }
+            }
+          }
+        },
+        "solid.hollowBox": {
+          "role": "生成带指定壁厚和开口方向的盒状壳体",
+          "inputKinds": [],
+          "outputKind": "geom3",
+          "paramsSchema": {
+            "type": "object",
+            "required": [
+              "size",
+              "wallThickness"
+            ],
+            "properties": {
+              "size": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3"
+              },
+              "center": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/vector3",
+                "default": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "wallThickness": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/numberValue",
+                "exclusiveMinimum": 0
+              },
+              "openAxis": {
+                "$ref": "aiscad.dsl/actions/common.types#/$defs/axis",
+                "default": "z"
+              },
+              "openSide": {
+                "type": "string",
+                "enum": [
+                  "positive",
+                  "negative"
+                ],
+                "default": "negative"
+              }
+            },
+            "additionalProperties": false
+          },
+          "llm": {
+            "webSupported": true,
+            "summary": "生成带指定壁厚和开口方向的盒状壳体",
+            "requiredParams": [
+              "size",
+              "wallThickness"
+            ],
+            "paramGuide": {
+              "size": "vector3，长度为 3 的数值数组。外部包络尺寸，即整个盒状壳体的总长宽高。",
+              "center": "vector3，长度为 3 的数值数组。外部壳体中心点坐标。默认值 [0, 0, 0]。",
+              "wallThickness": "number，数值，或 {\"$var\":\"变量名\"}。统一壁厚。非开口方向会保留两侧壁厚，开口方向只保留一侧壁厚。",
+              "openAxis": "axis，字符串，只能是 x / y / z。壳体开口所沿的轴。默认值 \"z\"。",
+              "openSide": "enum，可选值：positive / negative。壳体开口位于 openAxis 的正侧或负侧。默认值 \"negative\"。"
+            },
+            "constraints": [
+              "wallThickness 必须大于 0。",
+              "在非开口轴上，外尺寸必须大于 2 倍 wallThickness；在开口轴上，外尺寸必须大于 wallThickness。",
+              "该 action 表达的是盒状壳体；size 是外尺寸，不是内腔尺寸。"
+            ],
+            "whenToUse": [
+              "需要表达盒体、盒盖、托盘、外壳等规则盒状壳体，并且已知外尺寸、壁厚和开口方向时使用。",
+              "当你本来会用 outer box 减 inner box 来手工构造壳体时，优先使用它。"
+            ],
+            "whenNotToUse": [
+              "不要把它用于非盒状、强曲面或自由形体壳体。",
+              "当需要不同面使用不同壁厚，或需要多个开口方向时，不要优先使用它。"
+            ],
+            "commonMistakes": [
+              "把 size 当成内腔尺寸，导致整体外形比需求大一圈。",
+              "把 wallThickness 只理解为侧壁厚度，却忘记开口对面的顶板也会保留该厚度。",
+              "openAxis 或 openSide 选错，导致开口方向与预期相反。"
+            ],
+            "recommendedBefore": [],
+            "recommendedAfter": [
+              "boolean.subtract",
+              "transform.translate",
+              "display.color"
+            ],
+            "stabilityNotes": [
+              "对于规则盒状壳体，solid.hollowBox 比手工用两个 box 做布尔差更稳定，也更不容易让 AI 算错内腔高度与中心点。"
+            ],
+            "inputExpectation": "该 action 不依赖前序几何输入。",
+            "outputMeaning": "输出是带统一壁厚且沿指定方向开口的盒状壳体实体，可继续开孔、添加凸耳或做装配特征。",
+            "example": {
+              "id": "solid_hollowBox_example",
+              "action": "solid.hollowBox",
+              "params": {
+                "size": [
+                  180,
+                  120,
+                  18
+                ],
+                "center": [
+                  0,
+                  0,
+                  9
+                ],
+                "wallThickness": 3,
+                "openAxis": "z",
+                "openSide": "negative"
               }
             }
           }
@@ -2130,20 +2262,27 @@
               "faces"
             ],
             "paramGuide": {
-              "points": "point3[]，三维点数组。 点列表，按顺序定义轮廓或路径。",
-              "faces": "array，数组。 面索引列表。",
+              "points": "point3[]，三维点数组。顶点坐标列表，所有 faces 都只能引用这里的索引。",
+              "faces": "array，数组。面索引列表；每个面至少 3 个顶点索引，且应共同构成闭合实体。",
               "orientation": "enum，可选值：outward / inward。 多面体面朝向。 默认值 \"outward\"。"
             },
-            "constraints": [],
+            "constraints": [
+              "faces 中的索引必须引用 points 中存在的顶点。",
+              "各个面应共同构成闭合实体，面朝向需尽量一致；否则可能出现缺面、翻面或看起来像空壳。",
+              "当目标只是规则小特征、斜面台阶或局部回钩时，不要优先使用 polyhedron。"
+            ],
             "whenToUse": [
-              "可以直接用基础体表达主体时优先使用。",
-              "当结构接近标准几何原语时，优先用 solid 而不是复杂草图。"
+              "标准 primitive、二维草图拉伸或回转都难以表达时使用。",
+              "需要显式控制顶点位置与面连接关系，或需要构造非标准网格实体时使用。"
             ],
             "whenNotToUse": [
-              "不要为了拟合简单结构而放弃更稳定的 primitive 路线。"
+              "不要把 polyhedron 当成做小型规则特征的首选，例如简单凸耳、台阶、回钩、肋或规则斜面。",
+              "当结构可以用 sketch + construct.extrudeLinear，或 primitive + boolean 更稳定表达时，不要优先使用它。"
             ],
             "commonMistakes": [
-              "基础体尺寸与中心点理解错误，导致后续布尔位置整体偏移。"
+              "faces 的顶点顺序不一致，导致法线翻转、缺面或透明预览时像空壳。",
+              "面没有真正闭合成实体，或不同面之间存在缝隙、重叠和自交。",
+              "顶点索引写错，引用了不存在的点，或同一局部特征本可用更简单 action 却强行使用 polyhedron。"
             ],
             "recommendedBefore": [],
             "recommendedAfter": [
@@ -2153,10 +2292,11 @@
               "boolean.subtract"
             ],
             "stabilityNotes": [
-              "primitive + transform + boolean 通常比一次性构造复杂轮廓更稳。"
+              "polyhedron 自由度高但风险也高；对 AI 来说比 primitive、polygon + extrude 或 boolean 路线更容易出错。",
+              "规则小特征优先使用 primitive + boolean；带角度的截面优先使用 sketch.polygon + construct.extrudeLinear。"
             ],
-            "inputExpectation": "该 action 不依赖前序几何输入。",
-            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "inputExpectation": "该 action 不依赖前序几何输入，但 points 与 faces 必须成套设计，不能只凭局部感觉临时拼接。",
+            "outputMeaning": "输出是由显式顶点和面定义的三维实体，适合表达非标准网格形体，但稳定性依赖顶点与面的拓扑质量。",
             "example": {
               "id": "solid_polyhedron_example",
               "action": "solid.polyhedron",
@@ -2270,19 +2410,25 @@
               "twistAngle": "number，数值，或 {\"$var\":\"变量名\"}。 拉伸扭转角度，单位为度。 默认值 0。",
               "twistSteps": "integer，整数，或 {\"$var\":\"变量名\"}。 扭转插值步数。 默认值 1。"
             },
-            "constraints": [],
+            "constraints": [
+              "source 应是有效的封闭二维草图。",
+              "如果拉伸结果后续要参与 union 或 subtract，其高度与定位应确保和目标存在明确重叠，而不是只停在接触边界。"
+            ],
             "whenToUse": [
               "需要把二维信息提升为三维实体，或在 2D/3D 之间转换时使用。",
-              "板件、法兰、孔槽、轮廓类实体通常优先用它从稳定草图得到实体。"
+              "板件、法兰、孔槽、轮廓类实体通常优先用它从稳定草图得到实体。",
+              "带角度的局部回钩、楔形凸耳、加强肋、异形截面特征，通常优先用稳定草图拉伸得到。"
             ],
             "whenNotToUse": [
-              "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。"
+              "不要跳过输入对象类型约束，例如用 curve2 去线性拉伸。",
+              "不要拿它去拉伸自交、语义混乱或明显不稳定的草图。"
             ],
             "commonMistakes": [
               "把 2D 中间态当成最终实体结果。",
               "对不稳定草图直接拉伸，导致后续布尔复杂度升高。",
               "source 仍是开路径或无效草图。",
-              "得到 geom3 后又继续按二维心智理解结果。"
+              "得到 geom3 后又继续按二维心智理解结果。",
+              "拉伸出的附着特征只在一个面上贴住主体就直接 union，导致结果不稳定。"
             ],
             "recommendedBefore": [
               "sketch.rectangle",
@@ -2298,10 +2444,11 @@
             ],
             "stabilityNotes": [
               "构造类 action 通常是从草图阶段进入实体阶段的关键分界点。",
-              "这是从二维草图进入可打印实体的常见稳定路径。"
+              "这是从二维草图进入可打印实体的常见稳定路径。",
+              "带角度的局部规则特征优先用 sketch.polygon + construct.extrudeLinear，通常比直接写 solid.polyhedron 更稳。"
             ],
             "inputExpectation": "输入通常来自这些类型之一：geom2。",
-            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础。",
+            "outputMeaning": "输出是三维实体，可作为可打印或实体布尔阶段的基础；若用于附着特征，通常还会继续 translate 并与主体形成明确重叠。",
             "example": {
               "id": "construct_extrudeLinear_example",
               "action": "construct.extrudeLinear",
@@ -2900,19 +3047,22 @@
               "offset": "vector3，长度为 3 的数值数组。相对位移向量，不是目标 center 坐标。"
             },
             "constraints": [
-              "offset 表示相对位移，不是对象最终中心点坐标。"
+              "offset 表示相对位移，不是对象最终中心点坐标。",
+              "如果平移后的对象下一步要与主体做 boolean.union，通常应让它与主体形成明确重叠，而不是只共面贴住。"
             ],
             "whenToUse": [
               "对象已经建好，只需要整体移动到目标位置、边、面或装配位置时使用。",
-              "适合把单个孔、槽、凸台或零件定位到明确坐标。"
+              "适合把单个孔、槽、凸台、卡扣臂或局部特征定位到明确坐标。"
             ],
             "whenNotToUse": [
               "不要把 offset 当成绝对中心点坐标；它表示相对位移。",
-              "不要把平移当成重复分布或对称复制；那更适合 pattern 或 mirror。"
+              "不要把平移当成重复分布或对称复制；那更适合 pattern 或 mirror。",
+              "不要把附着特征只移到刚好贴在主体表面；如果下一步要 union，最好让它略微嵌入主体形成重叠。"
             ],
             "commonMistakes": [
               "把 offset 写成目标中心坐标，导致对象移动过头。",
-              "source 本身已经带偏移，又额外平移一次，导致布尔或装配错位。"
+              "source 本身已经带偏移，又额外平移一次，导致布尔或装配错位。",
+              "给要并入主体的特征定位时，只让它接触边界而没有实际重叠，导致后续 union 不稳定。"
             ],
             "recommendedBefore": [],
             "recommendedAfter": [
@@ -2922,7 +3072,8 @@
               "display.group"
             ],
             "stabilityNotes": [
-              "优先先在局部坐标里建出稳定对象，再通过 translate 放到目标位置。"
+              "优先先在局部坐标里建出稳定对象，再通过 translate 放到目标位置。",
+              "如果 translate 之后要参与 union，工程上通常会让附着特征轻微压入主体一点点，这比刚好贴面更稳。"
             ],
             "inputExpectation": "输入通常来自这些类型之一：curve2 / geom2 / geom3 / group。",
             "outputMeaning": "输出是整体平移后的对象，数量、拓扑和尺寸不变。",
@@ -3347,21 +3498,25 @@
               "sources"
             ],
             "paramGuide": {
-              "sources": "ref[]，字符串数组，引用多个前序 action 的 id。 多个输入对象引用数组。"
+              "sources": "ref[]，字符串数组，引用多个前序 action 的 id。若目标是单一实体，这些对象应在几何上真正重叠，而不只是表面接触。"
             },
-            "constraints": [],
+            "constraints": [
+              "sources 中的对象必须是同维几何。",
+              "如果目标是熔成一个连续实体，sources 之间应存在明确的面积重叠或体积重叠，不要只共面、共边或单点接触。",
+              "如果只是想把多个独立零件一起输出或预览，不要使用 union，应改用 display.group。"
+            ],
             "whenToUse": [
-              "需要把主体与新增特征并成一个几何体时使用。",
-              "适合把本应连成一体的对象合成为单个结果。"
+              "需要把主体与新增特征真正熔合成一个连续几何体时使用。",
+              "适合主体与凸台、肋、卡扣臂、法兰、局部补强等已经定位完成，且彼此存在明确重叠关系的场景。"
             ],
             "whenNotToUse": [
               "不要仅仅为了把多个独立零件一起显示而使用 union；那更适合 display.group。",
-              "不要在对象关系还没定位清楚时盲目 union。"
+              "不要在对象只是刚好贴面、碰边或碰点时盲目 union；这种零厚度接触对布尔非常不稳定。"
             ],
             "commonMistakes": [
+              "以为两个对象只要视觉上贴住，union 就一定能稳定变成一个整体。",
               "希望保留独立零件，却误用了 union 导致它们变成一个体。",
-              "输入对象维度不一致。",
-              "本来只想逻辑分组预览，却把 union 当成 group。"
+              "输入对象维度不一致，或附着特征与主体几乎没有实际重叠。"
             ],
             "recommendedBefore": [
               "solid.box",
@@ -3375,10 +3530,11 @@
               "transform.translate"
             ],
             "stabilityNotes": [
+              "union 更稳定的前提是几何上存在明确重叠；对附着特征，通常要让它略微嵌入主体，而不是刚好贴在表面。",
               "union 适合在定位完成后把新增特征并入主体，不要让它承担全部结构组织责任。"
             ],
             "inputExpectation": "输入通常来自这些类型之一：geom2 / geom3 / group。",
-            "outputMeaning": "输出是单一几何结果，sources 不再彼此独立。",
+            "outputMeaning": "输出是单一几何结果，sources 不再彼此独立；如果输入之间只有接触而没有真实重叠，结果可能不稳定。",
             "example": {
               "id": "boolean_union_example",
               "action": "boolean.union",

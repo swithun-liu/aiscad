@@ -13,7 +13,19 @@ export const AI_READABLE_DSL_REFERENCE = {
   ),
 }
 
-export function buildDslPrompt(description) {
+function buildSketchPromptSection(sketch) {
+  if (!sketch?.strokes?.length) return '无'
+
+  return `${JSON.stringify(sketch, null, 2)}
+
+草图使用说明：
+- 这是用户手绘的二维辅助示意，坐标已归一化到 [0,1]，原点在左上角。
+- 草图主要表达局部形状、凹凸关系、开口方向、相对位置和截面意图，不保证严格尺寸。
+- 明确数值尺寸仍以文字需求为准；草图用于补充空间关系。`
+}
+
+export function buildDslPrompt(description, options = {}) {
+  const sketchSection = buildSketchPromptSection(options.sketch)
   return `你是 AISCAD DSL 生成器。
 
 目标：根据用户描述输出一份可执行的 AISCAD DSL JSON。
@@ -38,6 +50,9 @@ ${JSON.stringify(GLOBAL_DSL_GENERATION_RULES, null, 2)}
 
 下面是可以直接阅读并遵守的 DSL 定义 JSON：
 ${JSON.stringify(AI_READABLE_DSL_REFERENCE, null, 2)}
+
+辅助草图输入：
+${sketchSection}
 
 用户需求：
 ${description}`
